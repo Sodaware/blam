@@ -57,24 +57,20 @@ Import "../functions/project_functions.bmx"
 Import "../types/fileset.bmx"
 
 
-' ------------------------------------------------------------
-' -- PROJECT BUILDER TYPE
-' ------------------------------------------------------------
-
 ''' <summary>A project builder.</summary>
 Type ProjectBuilder
 	
-	Field m_ServiceManager:ServiceManager		'''< Services
+	Field _serviceManager:ServiceManager    '''< Services
 
-	Field m_BuildScript:BuildScript				'''< The script to execute. 
-	Field m_BuildLog:BuildLogger				'''< The build log for the script
+	Field _buildScript:BuildScript          '''< The script to execute. 
+	Field _buildLog:BuildLogger             '''< The build log for the script
 	
-	Field m_Target:String						'''< The target to execute
-	Field m_VerboseMode:Int
+	Field _target:String                    '''< The target to execute
+	Field _verboseMode:Byte                 '''< Is verbose mode enabled>
 	
-	Field m_BuildQueue:TList					'''< A queue of targets to execute (again, do we need this?)
-	Field m_TargetExecutionStack:TList			'''< The stack of targets to execute (do we need this?)
-	Field m_ExecutedTargets:TList				'''< A list of target names that have been executed
+	Field _buildQueue:TList                 '''< A queue of targets to execute
+	Field _targetExecutionStack:TList       '''< The stack of targets to execute
+	Field _executedTargets:TList            '''< A list of target names that have been executed
 	
 	
 	' ------------------------------------------------------------
@@ -85,8 +81,8 @@ Type ProjectBuilder
 	''' <param name="name">Name of the property to set.</param>
 	''' <param name="value">String value of the property.</param>
 	Method setGlobalProperty(name:String, value:String)
-		If Self.m_BuildScript <> Null Then
-			Self.m_BuildScript.setProperty(name, value)
+		If Self._buildScript Then
+			Self._buildScript.setProperty(name, value)
 		End If
 	End Method
 	
@@ -97,22 +93,22 @@ Type ProjectBuilder
 	
 	''' <summary>Enable or disable verbose mode.</summary>
 	''' <param name="enabled">Enabled value</param>
-	Method setVerboseMode(enabled:Int = True)
-		Self.m_VerboseMode	= enabled
+	Method setVerboseMode(enabled:Byte = True)
+		Self._verboseMode = enabled
 	End Method
 	
 	''' <summary>Set the build script for this builder.</summary>
 	''' <param name="script">Set the build script to be executed.</param>
 	Method setScript(script:BuildScript)
-		Self.m_BuildScript	= script
-		Self.m_Target		= script.m_DefaultTarget
+		Self._buildScript = script
+		Self._target      = script.m_DefaultTarget
 	End Method
 	
 	''' <summary>Set the build target to execute.</summary>
 	''' <param name="target">Name of the target to execute.</param>
 	Method setTarget(target:String)		
 		' TODO: Check the target can be found
-		Self.m_Target 		= target
+		Self._target = target
 	End Method
 	
 	
@@ -127,7 +123,7 @@ Type ProjectBuilder
 		Local startTime:Int = MilliSecs()
 		
 		' Run global tasks
-		For Local task:BuildCommand = EachIn Self.m_BuildScript.m_GlobalTasks
+		For Local task:BuildCommand = EachIn Self._buildScript.m_GlobalTasks
 			Self._runTargetCommand(task)
 		Next
 		
@@ -151,15 +147,15 @@ Type ProjectBuilder
 	Method executeTarget(targetName:String = "")
 		
 		' Get the target to execute (if non passed in)
-		If targetName = "" Then targetName = Self.m_Target
+		If targetName = "" Then targetName = Self._target
 		
-		Local target:BuildTarget	= Self.m_BuildScript.getTarget(targetName)
+		Local target:BuildTarget = Self._buildScript.getTarget(targetName)
 		If target = Null Then Throw "Target ~q" + targetName + "~q not found."
 		
 		' -- Check if target has any dependencies
 		If target.hasDependencies() Then
 			For Local depends:String = EachIn target.getDependencies()
-				If Not(Self.m_ExecutedTargets.Contains(depends)) Then
+				If Not(Self._executedTargets.Contains(depends)) Then
 					Self.executeTarget(depends)
 				End If
 			Next
@@ -174,7 +170,7 @@ Type ProjectBuilder
 		Next
 		
 		' -- Leave & complete
-		Self.m_ExecutedTargets.AddLast(target.getName())
+		Self._executedTargets.AddLast(target.getName())
 		Self._leaveTarget()
 		
 	End Method
@@ -193,12 +189,12 @@ Type ProjectBuilder
 		
 		' TODO: Add option to hide or colorize this
 		' Show target
-		If Self.m_BuildScript.m_CurrentTarget <> Null Then Print
+		If Self._buildScript.m_CurrentTarget <> Null Then Print
 		PrintC("%y" + target.getName() + ":%n")
 
 		' Push to stack & set as current target
-		Self.m_TargetExecutionStack.AddLast(target)
-		Self.m_BuildScript.m_CurrentTarget = target
+		Self._targetExecutionStack.AddLast(target)
+		Self._buildScript.m_CurrentTarget = target
 		
 	End Method
 	
@@ -220,22 +216,22 @@ Type ProjectBuilder
 		If taskHandler = Null Then Throw "Command '" + cmd.m_Name + "' not found"
 		
 		Local taskType:TTypeId		= TTypeId.ForObject(taskhandler)
-		taskHandler._services		= Self.m_ServiceManager
-		taskHandler._project		= Self.m_BuildScript
+		taskHandler._services		= Self._serviceManager
+		taskHandler._project		= Self._buildScript
 
 		' Set build target fields
 		For Local fld:TField = EachIn taskType.Fields()
-						
+
 			' Skip private fields
 			If fld.Name().StartsWith("_") Or fld.Name().StartsWith("m_") Then Continue
-					
+
 			' Get value for this field
 			If cmd.m_Parameters.valueForKey(fld.Name()) <> Null Then
 				Local val:String = String(cmd.m_Parameters.ValueForKey(fld.Name()))
-			
+
 				' If contains expressions, parse it
 				If val.Contains("${") Then val = Self._parsePropertyValue(val)
-			
+
 				' Set the property
 				ProjectBuilder._setTaskProperty(fld, taskHandler, val)
 			EndIf
@@ -248,10 +244,10 @@ Type ProjectBuilder
 			For Local childNode:BuildNode = EachIn cmd.getChildren()
 			
 				' Create a BaseType object for child node name
-				Local child:BaseType 		= Self._createTypeFromBuildNode(childNode)
+				Local child:BaseType = Self._createTypeFromBuildNode(childNode)
 				If child <> Null Then
 					
-					Local childName:String		= TTypeId.ForObject(child).Name()
+					Local childName:String = TTypeId.ForObject(child).Name()
 					
 					' Get type
 					Local setMethodName:String	= "set" + childName.ToLower()
@@ -347,11 +343,11 @@ Type ProjectBuilder
 				' -- Add project
 				
 				' -- Add functions
-				eval.__autoload(Self.m_BuildScript)
+				eval.__autoload(Self._buildScript)
 				
 				' -- Add properties			
-				eval.addProperties(Self.m_BuildScript.m_GlobalProperties)
-				eval.addProperties(Self.m_BuildScript.getCurrentTargetProperties())
+				eval.addProperties(Self._buildScript.m_GlobalProperties)
+				eval.addProperties(Self._buildScript.getCurrentTargetProperties())
 								
 				' -- Execute
 				Local res:ScriptObject = eval.Evaluate()
@@ -384,25 +380,29 @@ Type ProjectBuilder
 	End Function
 	
 	Method _leaveTarget()
-		If Self.m_TargetExecutionStack.Count() < 1 Then Return
-		BuildTarget(Self.m_TargetExecutionStack.RemoveLast())
+		If Self._targetExecutionStack.Count() < 1 Then Return
+		BuildTarget(Self._targetExecutionStack.RemoveLast())
 	End Method
 	
 	Method _getTaskManager:TaskManagerService()
 		Return TaskManagerService( ..
-			Self.m_ServiceManager.GetService(TTypeId.ForName("TaskManagerService")) ..
+			Self._serviceManager.GetService(TTypeId.ForName("TaskManagerService")) ..
 		)
 	End Method
 	
+	Method setServiceManager(manager:ServiceManager)
+		Self._serviceManager = manager
+	End Method
+
 	
 	' ------------------------------------------------------------
 	' -- Creation & Destruction
 	' ------------------------------------------------------------
 	
 	Method New()
-		Self.m_BuildQueue	 		= New TList
-		Self.m_TargetExecutionStack	= New TList
-		Self.m_ExecutedTargets		= New TList
+		Self._buildQueue	 		= New TList
+		Self._targetExecutionStack	= New TList
+		Self._executedTargets		= New TList
 	End Method
 	
 End Type
