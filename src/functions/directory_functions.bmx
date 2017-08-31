@@ -18,22 +18,25 @@ Import sodaware.File_Util
 Import "function_set.bmx"
 
 Type DirectoryFunctions Extends FunctionSet
-	
-	Method Exists:Int(path:String)				{ name="directory::exists" }
-		
+
+	''' <summary>Check if a directory exists.</summary>
+	''' <param name="path">The directory path to search for.</param>
+	''' <returns>True if the path exists, false if not.</returns>
+	Method exists:Byte(path:String)				{ name = "directory::exists" }
+
 		' Strip trailing slashes
 		If path.EndsWith("/") Or path.EndsWith("\") Then 
 			path = Left(path, path.Length - 1)
 		EndIf
-		
+
 		' Check it exists
 		Return (FileType(path) = FILETYPE_DIR)
-	
+
 	End Method
-	
+
 	''' <deprecated>Use directory::exists instead.</deprecated>
-	Method _dirExists:Int(path:String)			{ name="path::exists" }
-		Return Self.Exists(path)
+	Method _dirExists:Int(path:String)			{ name = "path::exists" }
+		Return Self.exists(path)
 	End Method
-	
+
 End Type
