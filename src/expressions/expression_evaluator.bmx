@@ -744,7 +744,7 @@ Type ExpressionEvaluator
 		Local func:ScriptFunction = scriptfunction(Self.m_RegisteredFunctions.ValueForKey(functionName))
 		If func = Null Then Throw "No handler found for function '" + functionName + "'"
 		
-		Return func.m_Method.ArgTypes().Length
+		Return func.countFunctionParameters()
 	End Method
 	
 	
