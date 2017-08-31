@@ -40,15 +40,12 @@ Type ConsoleOptions Extends CommandLineOptions
 		' Args: Column Width, Use Colours
 		PrintC "%YCommands:%n "
 		PrintC(Super.CreateHelp(80, True))
-		
-'		PrintC "%PCommands: "
-'		PrintC "%n"
-		
+
 	End Method
 
 	' sorry :(
 	Method New()
 		Super.Init(AppArgs)
 	End Method
-	
+
 End Type
