@@ -21,47 +21,41 @@ Import "service.bmx"
 
 Type ConfigurationService Extends Service
 
-	Field m_Config:Config			'''< Internal configuration object
-	
-	
+	Field _config:Config            '''< Internal configuration object
+
+
 	' ------------------------------------------------------------
 	' -- Configuration API
 	' ------------------------------------------------------------
-	
+
+	''' <summary>Get a value from the configuration file.</summary>
+	''' <param name="sectionName">The section the key belongs to.</param>
+	''' <param name="keyName">The key name to retrieve.</param>
+	''' <returns>
+	''' The value for the section + key, or an empty string if not found.
+	''' </returns>
 	Method getKey:String(sectionName:String, keyName:String)
-		Return Self.m_Config.getKey(sectionName, keyName)
+		Return Self._config.getKey(sectionName, keyName)
 	End Method
-	
-	
+
+
 	' ------------------------------------------------------------
 	' -- Standard service methods
 	' ------------------------------------------------------------
 
-	Method InitialiseService()
-		
+	Method initialiseService()
+
 		' Load configuration file
-		Self.m_Config	= New Config
-		IniConfigSerializer.Load(Self.m_Config, File_Util.pathcombine(AppDir, "blitzbuild.ini"))
-		
+		Self._config = New Config
+		IniConfigSerializer.Load(Self._config, File_Util.pathcombine(AppDir, "blitzbuild.ini"))
+
 		' TODO: Check that important values are set
-		
+
 	End Method
 	
-	Method UnloadService()
-		
-		' Save settings
-		Self.m_Config = Null
+	Method unloadService()
+		Self._config = Null
 		GCCollect()
-		
-	End Method
-	
-	
-	' ------------------------------------------------------------
-	' -- Construction & Destruction
-	' ------------------------------------------------------------
-	
-	Method New()
-	
 	End Method
 
 End Type
