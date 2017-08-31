@@ -14,30 +14,21 @@ SuperStrict
 
 Type CharHelper 
 
-	Function IsLetterOrDigit:Int(char$)
-		
-		Return CharHelper.IsLetter(char) Or CharHelper.isdigit(char)
-		
+	Function IsLetterOrDigit:Byte(character:String)
+		Return CharHelper.IsLetter(character) Or CharHelper.isdigit(character)
 	End Function
 	
-	Function IsWhitespace%(char$)
-		
-		If Asc(char) < 33 Or Asc(char) >= 127 Or char="" Then Return True
-		
+	Function IsWhitespace:Byte(character:String)
+		Return ( Asc(character) < 33 Or Asc(character) >= 127 Or character = "" )
 	End Function
 	
-	Function IsDigit%(char$)
-		
-		If Asc(char) >= 48 And Asc(char) =< 57 Then Return True
-		
+	Function IsDigit:Byte(character:String)
+		Return ( Asc(character) >= 48 And Asc(character) =< 57 )
 	End Function
 	
-	Function IsLetter:Int(char$)
-		
-		Local charValue%	= Asc(char)
-		
-		If (charValue >= 65 And charValue <= 90) Or (charValue >= 97 And charValue =< 122) Then Return True
-		
+	Function IsLetter:Int(character:String)
+		Local charValue:Byte = Asc(character)
+		Return (charValue >= 65 And charValue <= 90) Or (charValue >= 97 And charValue =< 122)
 	End Function
 
 End Type
