@@ -17,20 +17,19 @@ Import "../file/build_script.bmx"
 
 Type FunctionSet
 
-	Field m_Script:BuildScript
-	
-	
+	Field _script:BuildScript
+
+
 	' ------------------------------------------------------------
 	' -- Build script functions
 	' ------------------------------------------------------------
-	
+
 	Method getProject:BuildScript()
-		Return Self.m_Script
+		Return Self._script
 	End Method
-	
+
 	Method _setProject(script:BuildScript)
-		Self.m_Script = script
+		Self._script = script
 	End Method
-	
-	
+
 End Type
