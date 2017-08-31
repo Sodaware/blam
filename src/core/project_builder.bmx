@@ -47,11 +47,6 @@ Import "../tasks/file/delete_task.bmx"
 Import "../tasks/file/mkdir_task.bmx"
 Import "../tasks/file/zip_task.bmx"
 
-Import "../tasks/network/ftp_deploy_task.bmx"
-
-Import "../tasks/source_control/subversion/svn_export_task.bmx"
-Import "../tasks/source_control/subversion/svn_info_task.bmx"
-
 ' -- FUNCTIONS!
 Import "../functions/environment_functions.bmx"
 Import "../functions/directory_functions.bmx"
