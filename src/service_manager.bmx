@@ -20,46 +20,60 @@ Import "services/service.bmx"
 
 Type ServiceManager
 	
-	Field m_Services:TList			= New TList
-	Field m_ServiceLookup:TMap		= New TMap
-	
-	Method AddService(service:Service)
-		Self.m_Services.AddLast(service)
-		Self.m_ServiceLookup.Insert(TTypeId.ForObject(service), service)
+	Field _services:TList           = New TList
+	Field _serviceLookup:TMap       = New TMap
+
+
+	' ------------------------------------------------------------
+	' -- Adding and getting services
+	' ------------------------------------------------------------
+
+	''' <summary>Add a service to the manager.</summary>
+	''' <param name="service">The service object to add.</param>
+	Method addService(service:Service)
+		Self._services.AddLast(service)
+		Self._serviceLookup.Insert(TTypeId.ForObject(service), service)
 	End Method
-	
-	Method GetService:Service(serviceName:TTypeId)
-		
+
+	''' <summary>Get a service by its type id.</summary>
+	''' <param name="serviceType">The TTypeId to find.</param>
+	Method getService:Service(serviceType:TTypeId)
+
 		' Get service from lookup
-		Local theService:Service	= Service(Self.m_ServiceLookup.ValueForKey(serviceName))
-		
+		Local theService:Service = Service(Self._serviceLookup.ValueForKey(serviceType))
+
 		' If not found, search the list of services
 		If theService = Null Then
-			
-			For Local tService:Service = EachIn Self.m_Services
-				If TTypeId.ForObject(tService) = serviceName Then
+
+			For Local tService:Service = EachIn Self._services
+				If TTypeId.ForObject(tService) = serviceType Then
 					theService = tService
 					Exit
 				End If
 			Next
-			' If still not found, throw an error
+			' TODO: If still not found, throw an error
 		EndIf
-		
+
 		' Done
 		Return theService
-		
+
 	End Method
-	
-	Method InitaliseServices()
-		For Local tService:Service = EachIn Self.m_Services
-			tService.InitialiseService()
+
+
+	' ------------------------------------------------------------
+	' -- Initializing and stopping services
+	' ------------------------------------------------------------
+
+	Method initaliseServices()
+		For Local tService:Service = EachIn Self._services
+			tService.initialiseService()
 		Next
 	End Method
 	
-	Method StopServices()
-		Self.m_Services.Reverse()
-		For Local tService:Service = EachIn Self.m_Services
-			tService.UnloadService()
+	Method stopServices()
+		Self._services.Reverse()
+		For Local tService:Service = EachIn Self._services
+			tService.unloadService()
 		Next	
 	End Method
 	
