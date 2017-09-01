@@ -17,58 +17,72 @@ Import "../build_task.bmx"
 Import "../../types/fileset.bmx"
 
 Type CopyTask Extends BuildTask
-	
-	Field file:String
-	Field tofile:String
-	Field todir:String
-	Field overwrite:Int	= False
-	
-	Field files:Fileset
-	Field verbose:Int		= False			'''< [optional] Show verbose output
+
+	Field file:String                       '''< The file to copy. Can be replaced with fileset.
+	Field tofile:String                     '''< The destination filename to copy to. Ignored with fileset.
+	Field todir:String                      '''< The directory to copy the file/files to.
+	Field overwrite:Byte    = False         '''< If true will overwrite any files
+	Field files:Fileset	                    '''< [optional] List of files to copy.
+	Field verbose:Int       = False         '''< [optional] Show verbose output
+
+
+	' ------------------------------------------------------------
+	' -- Task Execution
+	' ------------------------------------------------------------
 
 	Method execute()
 
-' [todo] - Add some error checking here!
+		' [todo] - Add some error checking here!
 
-		self.printHeader()
+		Self.printHeader()
 
 		Local filesToCopy:TList = self.files.getIncludedFiles()
-		local copiedFiles:Int   = 0
+		Local copiedFiles:Int   = 0
 
-		For local file:String = eachin filesToCopy
+		For Local file:String = EachIn filesToCopy
 
-			Local destination:STring = (file.replace(files.dir, self.todir))
+			Local destination:String = (file.Replace(files.dir, Self.todir))
 
-			' Check if it exists
-			if filetype(destination) = 1 and self.overwrite = false then continue
+			' Do nothing if the file already exists and overwriting is disabled.
+			If Self.overwrite = False And FileType(destination) = FILETYPE_FILE Then Continue
 
-			if self.verbose then
-				self.log(file + " => " + destination)
-			endif
+			If Self.verbose Then
+				Self.Log(file + " => " + destination)
+			EndIf
 
-			copyfile(file, destination)
+			CopyFile(file, destination)
 
 			copiedFiles:+ 1
 
-		next
+		Next
 
-		self.log("Copied " + copiedFiles + " of " + filesToCopy.count() + " files")
+		Self.Log("Copied " + copiedFiles + " of " + filesToCopy.count() + " files")
 
 	End Method
 
+
+	' ------------------------------------------------------------
+	' -- Configuration Helpers
+	' ------------------------------------------------------------
+
 	Method setFileset(files:Fileset)
-		self.files = files
-	end method
+		Self.files = files
+	End Method
+
+
+	' ------------------------------------------------------------
+	' -- Output Helpers
+	' ------------------------------------------------------------
 
 	Method printHeader()
-		
-		Local fromDirName:String 	= self.files.dir
-		local toDirName:String 		= self.todir
 
-		fromDirName = fromDirName.replace(ExtractDir(self.getProject().getFilePath()), "")
-		toDirName 	= toDirName.replace(ExtractDir(self.getProject().getFilePath()), "")
+		Local fromDirName:String = Self.files.dir
+		Local toDirName:String   = Self.todir
 
-		self.log("Copying from '" + fromDirName + "' to '" + toDirName + "'")
+		fromDirName = fromDirName.Replace(ExtractDir(Self.getProject().getFilePath()), "")
+		toDirName 	= toDirName.Replace(ExtractDir(Self.getProject().getFilePath()), "")
+
+		Self.Log("Copying from '" + fromDirName + "' to '" + toDirName + "'")
 
 	End Method
 
