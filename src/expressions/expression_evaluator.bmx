@@ -42,25 +42,32 @@ Type ExpressionEvaluator
 	' -- Public API
 	' ------------------------------------------------------------
 
+	''' <summary>
+	''' Register a FunctionSet with the evaluator. Scans the set object for
+	''' public methods (i.e. no `_` prefix) that have a name set in their meta
+	''' data. These methods are then available for use in expressions.
+	''' <summary>
+	''' <param name="set">The FunctionSet object to add.</param>
 	Method registerFunctionSet(set:FunctionSet)
-		
+
 		Local setType:TTypeId = TTypeId.ForObject(set)
 		For Local fnc:TMethod = EachIn setType.Methods()
-		
-			' -- Skip private methods & constructor
+
+			' Skip private methods and constructor.
 			If fnc.Name().StartsWith("_") Or fnc.Name() = "New" Then Continue
-			
-			' -- Get function call name from meta
-			Local meta:TMAP = ExpressionEvaluator.ParseMetaString(fnc.MetaData())
-			Local name:String = String(meta.ValueForKey("name"))
-			
-			' -- Register the function
-			Self._registeredFunctions.Insert(name, ScriptFunction.Create(set, fnc))
-			
+
+			' Get function call name from meta.
+			Local name:String = fnc.MetaData("name")
+
+			' Register the function if it has a name.
+			If name <> "" Then
+				Self._registeredFunctions.Insert(name, ScriptFunction.Create(set, fnc))
+			EndIf
+
 		Next
-		
+
 	End Method
-	
+
 	''' <summary>Register a ScriptFunction object to use.</summary>
 	Method RegisterFunction:Int(func:ScriptFunction)
 		Self._registeredFunctions.Insert(func.GetFullName(), func)
