@@ -708,66 +708,8 @@ Type ExpressionEvaluator
 		Next
 		
 	End Method
-	
-	Function ParseMetaString:TMap(meta:String)
-		
-		Local metaData:TMap	      = New TMap
-		
-		Local currentField:String = ""
-		Local currentValue:String = ""
-		Local inString:Int        = False
-		Local isField:Int         = True
-		
-		For Local pos:Int = 0 To meta.Length
-			
-			Local currentChar:String = Mid(meta, pos, 1) 'Chr(meta[pos])
-			
-			Select currentChar
-				
-				Case "="
-					If Not(inString) Then isField = Not(isField)
-					
-				Case "~q"
-					inString = Not(inString)
-					
-				Case " "
-					' If not in a string, we're at the end of a field
-					If inString = False Then
-						metaData.Insert(currentField, currentValue)
-						currentField = ""
-						currentValue = ""
-						isField = True
-					Else
-						If isField Then 
-							currentField:+ currentChar	
-						Else 
-							currentValue:+ currentChar	
-						End If
-					End If
-					
-				Default
-				
-					' No special character - add to field name / value
-					If isField Then 
-						currentField:+ currentChar	
-					Else 
-						currentValue:+ currentChar	
-					End If
-					
-			End Select
-			
-		Next
-		
-		' Add last field
-		If currentField <> " " And currentField <> "" And isField = False Then
-			metaData.Insert(currentField, currentValue)
-		EndIf
-			
-		Return metaData
-		
-	End Function
-	
-	
+
+
 	' ------------------------------------------------------------
 	' -- Error handling
 	' ------------------------------------------------------------
