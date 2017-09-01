@@ -52,8 +52,8 @@ Type ProjectFunctions Extends FunctionSet
 		Local hasProperty:Int	= False
 		hasProperty = hasProperty Or Self.GetProject().hasProperty(propertyName)
 		
-		If Self.GetProject().m_CurrentTarget <> Null Then
-			hasProperty = hasProperty Or Self.GetProject().m_CurrentTarget.hasProperty(propertyName)			
+		If Self.GetProject().getCurrentTarget() <> Null Then
+			hasProperty = hasProperty Or Self.GetProject().getCurrentTarget().hasProperty(propertyName)			
 		End If
 		
 		Return hasProperty			

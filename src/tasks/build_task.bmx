@@ -39,12 +39,12 @@ Type BuildTask
 	
 	Method _setProperty(propName:String, propValue:String)
 		
-		If Self._project.m_CurrentTarget = Null Then
+		If Self._project.getCurrentTarget() = Null Then
 			' -- Global property
 			Self._project.setProperty(propName, propValue)
 		Else
 			' -- Local property
-			Self._project.m_CurrentTarget.setProperty(propName, propValue)		
+			Self._project.getCurrentTarget().setProperty(propName, propValue)
 		End If
 		
 	End Method

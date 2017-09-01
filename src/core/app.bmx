@@ -97,7 +97,7 @@ Type App
 		Local builder:ProjectBuilder = New ProjectBuilder
 		
 		' -- Populate its options
-		builder.m_ServiceManager	= Self._services
+		builder.setServiceManager(Self._services)
 		
 		' - Set build file
 		builder.setScript(script)
@@ -155,7 +155,7 @@ Type App
 		' Default target
 		PrintC "Default target:"
 		PrintC "--------------------------------------------------"
-		PrintC " " + file.m_DefaultTarget + "~n"
+		PrintC " " + file.getDefaultTargetName() + "~n"
 		
 		PrintC "Main targets:"
 		PrintC "--------------------------------------------------"

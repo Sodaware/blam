@@ -101,7 +101,7 @@ Type ProjectBuilder
 	''' <param name="script">Set the build script to be executed.</param>
 	Method setScript(script:BuildScript)
 		Self._buildScript = script
-		Self._target      = script.m_DefaultTarget
+		Self._target      = script.getDefaultTargetName()
 	End Method
 	
 	''' <summary>Set the build target to execute.</summary>
@@ -123,7 +123,7 @@ Type ProjectBuilder
 		Local startTime:Int = MilliSecs()
 		
 		' Run global tasks
-		For Local task:BuildCommand = EachIn Self._buildScript.m_GlobalTasks
+		For Local task:BuildCommand = EachIn Self._buildScript.getGlobalTasks()
 			Self._runTargetCommand(task)
 		Next
 		
@@ -189,12 +189,12 @@ Type ProjectBuilder
 		
 		' TODO: Add option to hide or colorize this
 		' Show target
-		If Self._buildScript.m_CurrentTarget <> Null Then Print
+		If Self._buildScript.getCurrentTarget() <> Null Then Print
 		PrintC("%y" + target.getName() + ":%n")
 
 		' Push to stack & set as current target
 		Self._targetExecutionStack.AddLast(target)
-		Self._buildScript.m_CurrentTarget = target
+		Self._buildScript.setCurrentTarget(target)
 		
 	End Method
 	
@@ -346,7 +346,7 @@ Type ProjectBuilder
 				eval.__autoload(Self._buildScript)
 				
 				' -- Add properties			
-				eval.addProperties(Self._buildScript.m_GlobalProperties)
+				eval.addProperties(Self._buildScript.getGlobalProperties())
 				eval.addProperties(Self._buildScript.getCurrentTargetProperties())
 								
 				' -- Execute

@@ -34,11 +34,11 @@ Type XmlBuildScriptSerializer extends BuildScriptSerializer
 		If rootNode.getChildren().Count() = 0 Then Return Null
 	
 		' File info
-		script.m_FilePath				= fileName
+		script._filePath				= fileName
 		
 		' Project info
-		script.m_ProjectName			= xpath.evalExpression("//project/@name").castToString()
-		script.m_DefaultTarget			= xpath.evalExpression("//project/@default").castToString()
+		script._projectName			= xpath.evalExpression("//project/@name").castToString()
+		script._defaultTarget			= xpath.evalExpression("//project/@default").castToString()
 		
 		' Load global tasks
 		Local task:TxmlNodeSet			= xpath.evalExpression("//project/*").getNodeSet()
@@ -96,7 +96,7 @@ Type XmlBuildScriptSerializer extends BuildScriptSerializer
 				Next
 			EndIf
 				
-			script.m_BuildTargets.Insert(target.m_Name, target)
+			script._buildTargets.Insert(target.m_Name, target)
 		Next
 				
 		' Cleanup & return
