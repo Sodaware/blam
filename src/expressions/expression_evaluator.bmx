@@ -217,113 +217,48 @@ Type ExpressionEvaluator
 	End Method
 	
 	' TODO: Fix all of these :D
-	Method ParseRelationalExpression:ScriptObject()
-	
-		Local p0:Int	= Self._tokeniser.CurrentPosition
-		Local o:ScriptObject	= Self.ParseAddSubtract()
-		
+	Method parseRelationalExpression:ScriptObject()
+
+		Local o:ScriptObject = Self.ParseAddSubtract()
+
 		If Self._tokeniser.IsRelationalOperator() Then
-			
-			Local op:Int	= Self._tokeniser.CurrentToken
+
+			Local op:Int = Self._tokeniser.CurrentToken
 			Self._tokeniser.GetNextToken()
-			
-			Local o2:ScriptObject	= Self.ParseAddSubtract()
-			Local p2:Int		= Self._tokeniser.CurrentPosition
-			
+
+			Local o2:ScriptObject = Self.ParseAddSubtract()
+
 			If Self._evalMode = EXPRESSIONEVALUATOR_MODE_PARSEONLY Then Return Null
-			
+
 			Select op
-				
+
 				' Equals operator
 				Case ExpressionTokeniser_TokenType_Equal
-				
 					Return ScriptObjectFactory.NewBool(o = o2)	
-				'	If o\m_Type = OBJ_STRING And o2\m_Type = OBJ_STRING Then Return ScriptObjectFactory.NewBool(o\m_ValueString = o2\m_ValueString)
-				'	If o\m_Type = OBJ_BOOL And o2\m_Type = OBJ_BOOL Then Return ScriptObjectFactory.NewBool(o\m_ValueInt = o2\m_ValueInt)
-				'	If o\m_Type = OBJ_INT And o2\m_Type = OBJ_INT Then Return ScriptObjectFactory.NewBool(o\m_ValueInt = o2\m_ValueInt)
-					
-				'	If o\m_Type = OBJ_FLOAT And o2\m_Type = OBJ_FLOAT Then Return ScriptObjectFactory.NewBool(o\m_ValueFloat = o2\m_ValueFloat)
-				'	If o\m_Type = OBJ_FLOAT And o2\m_Type = OBJ_INT Then Return ScriptObjectFactory.NewBool(o\m_ValueFloat = Float(o2\m_ValueInt))
-				'	If o\m_Type = OBJ_INT And o2\m_Type = OBJ_FLOAT Then Return ScriptObjectFactory.NewBool(Float(o\m_ValueInt) = o2\m_ValueFloat)
-					
-					RuntimeError("Can't compare values")
-				
+
 				Case ExpressionTokeniser_TokenType_NotEqual
 					Return ScriptObjectFactory.NewBool(o <> o2)
-					
-					'If o\m_Type = OBJ_STRING And o2\m_Type = OBJ_STRING Then Return ScriptObjectFactory.NewBool(o\m_ValueString <> o2\m_ValueString)
-					'If o\m_Type = OBJ_BOOL And o2\m_Type = OBJ_BOOL Then Return ScriptObjectFactory.NewBool(o\m_ValueInt <> o2\m_ValueInt)
-					'If o\m_Type = OBJ_INT And o2\m_Type = OBJ_INT Then Return ScriptObjectFactory.NewBool(o\m_ValueInt <> o2\m_ValueInt)
-					
-					'If o\m_Type = OBJ_FLOAT And o2\m_Type = OBJ_FLOAT Then Return ScriptObjectFactory.NewBool(o\m_ValueFloat <> o2\m_ValueFloat)
-					'If o\m_Type = OBJ_FLOAT And o2\m_Type = OBJ_INT Then Return ScriptObjectFactory.NewBool(o\m_ValueFloat <> Float(o2\m_ValueInt))
-					'If o\m_Type = OBJ_INT And o2\m_Type = OBJ_FLOAT Then Return ScriptObjectFactory.NewBool(Float(o\m_ValueInt) <> o2\m_ValueFloat)
-					
-					RuntimeError("Can't compare values")
-				
-				Case ExpressionTokeniser_TokenType_LT
-				
+
+				Case ExpressionTokeniser_TokenType_LT				
 					Return ScriptObjectFactory.NewBool(Int(o.ToString()) < Int(o2.ToString()))
-	
-					'If o\m_Type = OBJ_STRING And o2\m_Type = OBJ_STRING Then Return ScriptObjectFactory.NewBool(o\m_ValueString < o2\m_ValueString)
-					'If o\m_Type = OBJ_BOOL And o2\m_Type = OBJ_BOOL Then Return ScriptObjectFactory.NewBool(o\m_ValueInt < o2\m_ValueInt)
-					'If o\m_Type = OBJ_INT And o2\m_Type = OBJ_INT Then Return ScriptObjectFactory.NewBool(o\m_ValueInt < o2\m_ValueInt)
-					
-					'If o\m_Type = OBJ_FLOAT And o2\m_Type = OBJ_FLOAT Then Return ScriptObjectFactory.NewBool(o\m_ValueFloat < o2\m_ValueFloat)
-					'If o\m_Type = OBJ_FLOAT And o2\m_Type = OBJ_INT Then Return ScriptObjectFactory.NewBool(o\m_ValueFloat < Float(o2\m_ValueInt))
-					'If o\m_Type = OBJ_INT And o2\m_Type = OBJ_FLOAT Then Return ScriptObjectFactory.NewBool(Float(o\m_ValueInt) < o2\m_ValueFloat)
-					
-					RuntimeError("Can't compare values")
-				
+
 				Case ExpressionTokeniser_TokenType_GT
 					Return ScriptObjectFactory.NewBool(Int(o.ToString()) > Int(o2.ToString()))
-				'	If o\m_Type = OBJ_STRING And o2\m_Type = OBJ_STRING Then Return ScriptObjectFactory.NewBool(o\m_ValueString > o2\m_ValueString)
-				'	If o\m_Type = OBJ_BOOL And o2\m_Type = OBJ_BOOL Then Return ScriptObjectFactory.NewBool(o\m_ValueInt > o2\m_ValueInt)
-				'	If o\m_Type = OBJ_INT And o2\m_Type = OBJ_INT Then Return ScriptObjectFactory.NewBool(o\m_ValueInt > o2\m_ValueInt)
-					
-				'	If o\m_Type = OBJ_FLOAT And o2\m_Type = OBJ_FLOAT Then Return ScriptObjectFactory.NewBool(o\m_ValueFloat > o2\m_ValueFloat)
-				'	If o\m_Type = OBJ_FLOAT And o2\m_Type = OBJ_INT Then Return ScriptObjectFactory.NewBool(o\m_ValueFloat > Float(o2\m_ValueInt))
-					'If o\m_Type = OBJ_INT And o2\m_Type = OBJ_FLOAT Then Return ScriptObjectFactory.NewBool(Float(o\m_ValueInt) > o2\m_ValueFloat)
-					
-					RuntimeError("Can't compare values")
-				
+
 				Case ExpressionTokeniser_TokenType_LE
 					Return ScriptObjectFactory.NewBool(Int(o.ToString()) <= Int(o2.ToString()))
-				rem
-					If o\m_Type = OBJ_STRING And o2\m_Type = OBJ_STRING Then Return ScriptObjectFactory.NewBool(o\m_ValueString <= o2\m_ValueString)
-					If o\m_Type = OBJ_BOOL And o2\m_Type = OBJ_BOOL Then Return ScriptObjectFactory.NewBool(o\m_ValueInt <= o2\m_ValueInt)
-					If o\m_Type = OBJ_INT And o2\m_Type = OBJ_INT Then Return ScriptObjectFactory.NewBool(o\m_ValueInt <= o2\m_ValueInt)
-					
-					If o\m_Type = OBJ_FLOAT And o2\m_Type = OBJ_FLOAT Then Return ScriptObjectFactory.NewBool(o\m_ValueFloat <= o2\m_ValueFloat)
-					If o\m_Type = OBJ_FLOAT And o2\m_Type = OBJ_INT Then Return ScriptObjectFactory.NewBool(o\m_ValueFloat <= Float(o2\m_ValueInt))
-					If o\m_Type = OBJ_INT And o2\m_Type = OBJ_FLOAT Then Return ScriptObjectFactory.NewBool(Float(o\m_ValueInt) <= o2\m_ValueFloat)
-					
-					end rem
-					RuntimeError("Can't compare values")
-				
-				Case ExpressionTokeniser_TokenType_GE
-				
+
+				Case ExpressionTokeniser_TokenType_GE				
 					Return ScriptObjectFactory.NewBool(Int(o.ToString()) >= Int(o2.ToString()))
-	
-					rem
-					If o\m_Type = OBJ_STRING And o2\m_Type = OBJ_STRING Then Return ScriptObjectFactory.NewBool(o\m_ValueString >= o2\m_ValueString)
-					If o\m_Type = OBJ_BOOL And o2\m_Type = OBJ_BOOL Then Return ScriptObjectFactory.NewBool(o\m_ValueInt >= o2\m_ValueInt)
-					If o\m_Type = OBJ_INT And o2\m_Type = OBJ_INT Then Return ScriptObjectFactory.NewBool(o\m_ValueInt >= o2\m_ValueInt)
-					
-					If o\m_Type = OBJ_FLOAT And o2\m_Type = OBJ_FLOAT Then Return ScriptObjectFactory.NewBool(o\m_ValueFloat >= o2\m_ValueFloat)
-					If o\m_Type = OBJ_FLOAT And o2\m_Type = OBJ_INT Then Return ScriptObjectFactory.NewBool(o\m_ValueFloat >= Float(o2\m_ValueInt))
-					If o\m_Type = OBJ_INT And o2\m_Type = OBJ_FLOAT Then Return ScriptObjectFactory.NewBool(Float(o\m_ValueInt) >= o2\m_ValueFloat)
-					end rem
-					RuntimeError("Can't compare values")
-				
+
 			End Select
-			
+
 		EndIf
-	
+
 		Return o
-		
+
 	End Method
-	
+
 	Method ParseAddSubtract:ScriptObject()
 		
 		Local p0:Int	= Self._tokeniser.CurrentPosition
