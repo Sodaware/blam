@@ -24,27 +24,25 @@ Import "script_object.bmx"
 Import "../functions/function_set.bmx"
 Import "script_function.bmx"
 
-Const EXPRESSIONEVALUATOR_MODE_EVALUATE%	= 1
-Const EXPRESSIONEVALUATOR_MODE_PARSEONLY%	= 2
+Const EXPRESSIONEVALUATOR_MODE_EVALUATE:Byte  = 1
+Const EXPRESSIONEVALUATOR_MODE_PARSEONLY:Byte = 2
 
 Type ExpressionEvaluator
-	
-	' Private fields for the evaluator
-	Field m_EvalMode:Int
-	Field m_Tokeniser:ExpressionTokeniser
-	
-	Field m_RegisteredFunctions:TMAP
-	
+
+	' General use fields
+	Field _evalMode:Byte
+	Field _tokeniser:ExpressionTokeniser	
+	Field _registeredFunctions:TMap
+
 	' BlitzBuild specific fields
-	Field m_Properties:TMap			
-'	Field m_Project.BuildScript	;;; 
-	
-	
+	Field _properties:TMap			
+
+
 	' ------------------------------------------------------------
 	' -- Public API
 	' ------------------------------------------------------------
 
-	Method RegisterFunctionSet(set:FunctionSet)
+	Method registerFunctionSet(set:FunctionSet)
 		
 		Local setType:TTypeId = TTypeId.ForObject(set)
 		For Local fnc:TMethod = EachIn setType.Methods()
@@ -57,7 +55,7 @@ Type ExpressionEvaluator
 			Local name:String = String(meta.ValueForKey("name"))
 			
 			' -- Register the function
-			Self.m_RegisteredFunctions.Insert(name, ScriptFunction.Create(set, fnc))
+			Self._registeredFunctions.Insert(name, ScriptFunction.Create(set, fnc))
 			
 		Next
 		
@@ -65,26 +63,26 @@ Type ExpressionEvaluator
 	
 	''' <summary>Register a ScriptFunction object to use.</summary>
 	Method RegisterFunction:Int(func:ScriptFunction)
-		Self.m_RegisteredFunctions.Insert(func.GetFullName(), func)
+		Self._registeredFunctions.Insert(func.GetFullName(), func)
 	End Method
 	
 	Method RegisterStringProperty:Int(propName:String, propValue:String)
-		Self.m_Properties.Insert(propName, ScriptObjectFactory.NewString(propValue))
+		Self._properties.Insert(propName, ScriptObjectFactory.NewString(propValue))
 	End Method
 	
 	Method RegisterFloatProperty:Int(propName:String, propValue:Float)
-		Self.m_Properties.Insert(propName, ScriptObjectFactory.NewFloat(propValue))
+		Self._properties.Insert(propName, ScriptObjectFactory.NewFloat(propValue))
 	End Method
 	
 	Method RegisterIntProperty:Int(propName:String, propValue:Int)
-		Self.m_Properties.Insert(propName, ScriptObjectFactory.NewInt(propValue))
+		Self._properties.Insert(propName, ScriptObjectFactory.NewInt(propValue))
 	End Method
 	
 	' Merge a list of properties
 	Method AddProperties(propertyList:Tmap)
 		If propertyList = Null Then Return
 		For Local keyName:String = EachIn propertyList.Keys()
-			Self.m_Properties.Insert(keyName, ScriptObjectFactory.NewString(String(propertyList.ValueForKey(keyName))))
+			Self._properties.Insert(keyName, ScriptObjectFactory.NewString(String(propertyList.ValueForKey(keyName))))
 		Next
 	End Method
 	
@@ -120,8 +118,8 @@ Type ExpressionEvaluator
 		
 		Local result:ScriptObject	=  Self.ParseExpression()
 		
-		If Self.m_Tokeniser.CurrentToken <> ExpressionTokeniser_TokenType_EOF Then
-			Throw("Unexpected Char at end of expression: " + Self.m_Tokeniser.CurrentToken)
+		If Self._tokeniser.CurrentToken <> ExpressionTokeniser_TokenType_EOF Then
+			Throw("Unexpected Char at end of expression: " + Self._tokeniser.CurrentToken)
 		EndIf
 		
 		Return result
@@ -140,32 +138,32 @@ Type ExpressionEvaluator
 	Method ParseBooleanOr:ScriptObject()
 		
 		' 
-		' Local startPosition:Int		= Self.m_Tokeniser.CurrentPosition
+		' Local startPosition:Int		= Self._tokeniser.CurrentPosition
 		Local o1:ScriptObject		= Self.ParseBooleanAnd()
-		' Local oldEvalMode:Int		= Self.m_EvalMode
+		' Local oldEvalMode:Int		= Self._evalMode
 		
-		While(Self.m_Tokeniser.IsKeyword("or"))
+		While(Self._tokeniser.IsKeyword("or"))
 			
 			' Get the left hand side
 			Local v1:ScriptObject	= ScriptObjectFactory.NewBool( True )
 			
-			If Self.m_EvalMode	<> EXPRESSIONEVALUATOR_MODE_PARSEONLY Then
+			If Self._evalMode <> EXPRESSIONEVALUATOR_MODE_PARSEONLY Then
 				
 				' If true, we're done (because it's an or)
 				v1 = o1
 				If Int(v1.ToString()) Then
-					Self.m_EvalMode = EXPRESSIONEVALUATOR_MODE_PARSEONLY
+					Self._evalMode = EXPRESSIONEVALUATOR_MODE_PARSEONLY
 				EndIf
 				
 			EndIf
 			
 			' Right hand side
-			Self.m_Tokeniser.GetNextToken()
-		'	Local p2% 			= Self.m_Tokeniser.CurrentPosition
+			Self._tokeniser.GetNextToken()
+		'	Local p2% 			= Self._tokeniser.CurrentPosition
 			Local o2:ScriptObject		= Self.ParseBooleanAnd()
-		'	Local p3:Int 		= Self.m_Tokeniser.CurrentPosition
+		'	Local p3:Int 		= Self._tokeniser.CurrentPosition
 			
-			If Self.m_EvalMode	<> EXPRESSIONEVALUATOR_MODE_PARSEONLY Then
+			If Self._evalMode <> EXPRESSIONEVALUATOR_MODE_PARSEONLY Then
 				Local v2:ScriptObject 	= o2
 				o1 			= ScriptObjectFactory.NewBool( Int(v1.ToString()) Or Int(v2.ToString()) )
 			EndIf
@@ -178,36 +176,36 @@ Type ExpressionEvaluator
 	
 	Method ParseBooleanAnd:ScriptObject()
 		
-		Local p0:Int	= Self.m_Tokeniser.CurrentPosition
+		Local p0:Int	= Self._tokeniser.CurrentPosition
 		Local o:ScriptObject	= Self.ParseRelationalExpression()
 		
-		Local oldEvalMode:Int	= Self.m_EvalMode
+		Local oldEvalMode:Int	= Self._evalMode
 		
-		While(Self.m_Tokeniser.IsKeyword("and"))
+		While(Self._tokeniser.IsKeyword("and"))
 			
 			' Get the left hand side
 			Local v1:ScriptObject	= ScriptObjectFactory.NewBool( True )
 			
-			If Self.m_EvalMode	<> EXPRESSIONEVALUATOR_MODE_PARSEONLY Then
+			If Self._evalMode <> EXPRESSIONEVALUATOR_MODE_PARSEONLY Then
 				
 				'  If false, we're done (because it's an and)
 				v1 = o
 				
 				If Int(v1.ToString()) = False Then
 					' We're done - result must be false now
-					Self.m_EvalMode = EXPRESSIONEVALUATOR_MODE_PARSEONLY	
+					Self._evalMode = EXPRESSIONEVALUATOR_MODE_PARSEONLY	
 				EndIf
 				
 			EndIf
 			
 			' Right hand side
-			Self.m_Tokeniser.GetNextToken()
+			Self._tokeniser.GetNextToken()
 			
-			Local p2% 		= Self.m_Tokeniser.CurrentPosition
+			Local p2% 		= Self._tokeniser.CurrentPosition
 			Local o2:ScriptObject	= Self.ParseRelationalExpression()
-			Local p3:Int 	= Self.m_Tokeniser.CurrentPosition
+			Local p3:Int 	= Self._tokeniser.CurrentPosition
 			
-			If Self.m_EvalMode	<> EXPRESSIONEVALUATOR_MODE_PARSEONLY Then
+			If Self._evalMode <> EXPRESSIONEVALUATOR_MODE_PARSEONLY Then
 				Local v2:ScriptObject 	= o2
 				o 				= ScriptObjectFactory.NewBool( v1 And v2 )
 			EndIf
@@ -221,18 +219,18 @@ Type ExpressionEvaluator
 	' TODO: Fix all of these :D
 	Method ParseRelationalExpression:ScriptObject()
 	
-		Local p0:Int	= Self.m_Tokeniser.CurrentPosition
+		Local p0:Int	= Self._tokeniser.CurrentPosition
 		Local o:ScriptObject	= Self.ParseAddSubtract()
 		
-		If Self.m_Tokeniser.IsRelationalOperator() Then
+		If Self._tokeniser.IsRelationalOperator() Then
 			
-			Local op:Int	= Self.m_Tokeniser.CurrentToken
-			Self.m_Tokeniser.GetNextToken()
+			Local op:Int	= Self._tokeniser.CurrentToken
+			Self._tokeniser.GetNextToken()
 			
 			Local o2:ScriptObject	= Self.ParseAddSubtract()
-			Local p2:Int		= Self.m_Tokeniser.CurrentPosition
+			Local p2:Int		= Self._tokeniser.CurrentPosition
 			
-			If Self.m_EvalMode = EXPRESSIONEVALUATOR_MODE_PARSEONLY Then Return Null
+			If Self._evalMode = EXPRESSIONEVALUATOR_MODE_PARSEONLY Then Return Null
 			
 			Select op
 				
@@ -328,20 +326,20 @@ Type ExpressionEvaluator
 	
 	Method ParseAddSubtract:ScriptObject()
 		
-		Local p0:Int	= Self.m_Tokeniser.CurrentPosition
+		Local p0:Int	= Self._tokeniser.CurrentPosition
 		Local o:ScriptObject	= Self.ParseMulDiv()
 		Local o2:ScriptObject
 		Local p3:Int
 		
 		While(True)
 			
-			If Self.m_Tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Plus Then
+			If Self._tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Plus Then
 				
-				Self.m_Tokeniser.GetNextToken()
+				Self._tokeniser.GetNextToken()
 				o2:ScriptObject 	= Self.ParseMulDiv()
-				p3		= Self.m_Tokeniser.CurrentPosition
+				p3		= Self._tokeniser.CurrentPosition
 				
-				If Self.m_EvalMode <> EXPRESSIONEVALUATOR_MODE_PARSEONLY Then
+				If Self._evalMode <> EXPRESSIONEVALUATOR_MODE_PARSEONLY Then
 			
 					If ScriptObject.CanAdd(o, o2) Then
 						o = ScriptObject.AddObjects(o, o2)
@@ -351,13 +349,13 @@ Type ExpressionEvaluator
 				
 				EndIf
 				
-			ElseIf Self.m_Tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Minus Then
+			ElseIf Self._tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Minus Then
 				
-				Self.m_Tokeniser.GetNextToken()
+				Self._tokeniser.GetNextToken()
 				o2:ScriptObject 	= Self.ParseMulDiv()
-				p3		= Self.m_Tokeniser.CurrentPosition
+				p3		= Self._tokeniser.CurrentPosition
 				
-				If Self.m_EvalMode <> EXPRESSIONEVALUATOR_MODE_PARSEONLY Then
+				If Self._evalMode <> EXPRESSIONEVALUATOR_MODE_PARSEONLY Then
 					If ScriptObject.CanAdd(o, o2) Then
 						o = ScriptObject.SubtractObjects(o, o2)
 					Else
@@ -378,20 +376,20 @@ Type ExpressionEvaluator
 	
 	Method ParseMulDiv:ScriptObject()
 		
-		Local p0:Int	= Self.m_Tokeniser.CurrentPosition
+		Local p0:Int	= Self._tokeniser.CurrentPosition
 		Local o:ScriptObject	= Self.ParseValue()
 		Local o2:ScriptObject
 		Local p3:Int
 		
 		Repeat
 			
-			If Self.m_Tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Mul Then
+			If Self._tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Mul Then
 				
-				Self.m_Tokeniser.GetNextToken()
+				Self._tokeniser.GetNextToken()
 				o2	= Self.ParseValue()
-				p3	= self.m_Tokeniser.CurrentPosition
+				p3	= self._tokeniser.CurrentPosition
 				
-				If self.m_EvalMode <> EXPRESSIONEVALUATOR_MODE_PARSEONLY Then
+				If Self._evalMode <> EXPRESSIONEVALUATOR_MODE_PARSEONLY Then
 					if ScriptObject.CanMultiply(o, o2) Then
 						o = ScriptObject.MultiplyObjects(o, o2)
 					Else 
@@ -400,15 +398,15 @@ Type ExpressionEvaluator
 					
 				EndIf
 				
-			ElseIf Self.m_Tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Div Then
+			ElseIf Self._tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Div Then
 				
-				Self.m_Tokeniser.GetNextToken()
+				Self._tokeniser.GetNextToken()
 				o2	= Self.ParseValue()
-				p3	= Self.m_Tokeniser.CurrentPosition
+				p3	= Self._tokeniser.CurrentPosition
 				
 				If o2 = Null Then Self._throwSyntaxError()
 				
-				If self.m_EvalMode <> EXPRESSIONEVALUATOR_MODE_PARSEONLY Then
+				If self._evalMode <> EXPRESSIONEVALUATOR_MODE_PARSEONLY Then
 					
 					If ScriptObject.CanMultiply(o, o2) Then
 						o = ScriptObject.DivideObjects(o, o2)
@@ -418,13 +416,13 @@ Type ExpressionEvaluator
 					
 				EndIf
 				
-			ElseIf  Self.m_Tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Mod Then
+			ElseIf  Self._tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Mod Then
 				
-				Self.m_Tokeniser.GetNextToken()
+				Self._tokeniser.GetNextToken()
 				o2	= Self.ParseValue()
-				p3	= self.m_Tokeniser.CurrentPosition
+				p3	= self._tokeniser.CurrentPosition
 				
-				If self.m_EvalMode <> EXPRESSIONEVALUATOR_MODE_PARSEONLY Then
+				If self._evalMode <> EXPRESSIONEVALUATOR_MODE_PARSEONLY Then
 					
 					' Check for division by zero
 				'	If (o2\m_Type = OBJ_INT And o2\m_ValueInt = 0) Or (o2\m_Type = OBJ_FLOAT And o2\m_ValueFloat = 0) Then
@@ -464,37 +462,37 @@ Type ExpressionEvaluator
 		Local p1:Int
 		
 		' -- Plain string values
-		If Self.m_Tokeniser.CurrentToken = ExpressionTokeniser_TokenType_String Then
-			val = ScriptObjectFactory.NewString(Self.m_Tokeniser.TokenText)
-			Self.m_Tokeniser.GetNextToken()
+		If Self._tokeniser.CurrentToken = ExpressionTokeniser_TokenType_String Then
+			val = ScriptObjectFactory.NewString(Self._tokeniser.TokenText)
+			Self._tokeniser.GetNextToken()
 			Return val
 		EndIf
 		
 		' -- Plain number values
-		If Self.m_Tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Number Then
+		If Self._tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Number Then
 			
-			Local number$	= Self.m_Tokeniser.TokenText
+			Local number$	= Self._tokeniser.TokenText
 			
-			p0	= self.m_Tokeniser.CurrentPosition
-			Self.m_Tokeniser.GetNextToken()
-			p1	= self.m_Tokeniser.CurrentPosition - 1
+			p0	= self._tokeniser.CurrentPosition
+			Self._tokeniser.GetNextToken()
+			p1	= self._tokeniser.CurrentPosition - 1
 			
 			' Check for fractions
-			If Self.m_Tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Dot Then
+			If Self._tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Dot Then
 				number = number + "."
-				Self.m_Tokeniser.GetNextToken()
+				Self._tokeniser.GetNextToken()
 				
 				' Check there's a number after the decimal point
-				If Self.m_Tokeniser.CurrentToken <> ExpressionTokeniser_TokenType_Number Then
+				If Self._tokeniser.CurrentToken <> ExpressionTokeniser_TokenType_Number Then
 					Self._throwSyntaxError()
 				EndIf
 				
-				number = number + Self.m_Tokeniser.TokenText
+				number = number + Self._tokeniser.TokenText
 				
-				Self.m_Tokeniser.GetNextToken()
+				Self._tokeniser.GetNextToken()
 				
 				' Check for error
-				p1 = self.m_Tokeniser.CurrentPosition
+				p1 = self._tokeniser.CurrentPosition
 				
 				' Done
 				Return ScriptObjectFactory.NewFloat(Float(number))
@@ -507,16 +505,16 @@ Type ExpressionEvaluator
 		EndIf
 		
 		' -- Negative numbers
-		If Self.m_Tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Minus Then
+		If Self._tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Minus Then
 			
-			Self.m_Tokeniser.GetNextToken()
+			Self._tokeniser.GetNextToken()
 			
 			' Unary minus
-			p0	= self.m_Tokeniser.CurrentPosition
+			p0	= self._tokeniser.CurrentPosition
 			val	= Self.ParseValue()
-			p1	= self.m_Tokeniser.CurrentPosition
+			p1	= self._tokeniser.CurrentPosition
 			
-			If self.m_EvalMode <> EXPRESSIONEVALUATOR_MODE_PARSEONLY Then
+			If self._evalMode <> EXPRESSIONEVALUATOR_MODE_PARSEONLY Then
 				
 				' Update object value
 				'Select val\m_Type
@@ -535,15 +533,15 @@ Type ExpressionEvaluator
 		EndIf
 		
 		' Boolean "NOT"
-		If Self.m_Tokeniser.IsKeyword("not") Then
+		If Self._tokeniser.IsKeyword("not") Then
 			
-			Self.m_Tokeniser.GetNextToken()
+			Self._tokeniser.GetNextToken()
 			
-			p0	= self.m_Tokeniser.CurrentPosition
+			p0	= self._tokeniser.CurrentPosition
 			val	= Self.ParseValue()
-			p1	= self.m_Tokeniser.CurrentPosition
+			p1	= self._tokeniser.CurrentPosition
 			
-			If self.m_EvalMode <> EXPRESSIONEVALUATOR_MODE_PARSEONLY Then
+			If self._evalMode <> EXPRESSIONEVALUATOR_MODE_PARSEONLY Then
 				
 				' Update object value
 				' TODO: Fix this
@@ -558,74 +556,74 @@ Type ExpressionEvaluator
 		EndIf
 		
 		' Brackets
-		If Self.m_Tokeniser.CurrentToken = ExpressionTokeniser_TokenType_LeftParen Then
+		If Self._tokeniser.CurrentToken = ExpressionTokeniser_TokenType_LeftParen Then
 			
-			Self.m_Tokeniser.GetNextToken()
+			Self._tokeniser.GetNextToken()
 			
 			val	= Self.ParseExpression()
 			
-			If Self.m_Tokeniser.CurrentToken <> ExpressionTokeniser_TokenType_RightParen Then
+			If Self._tokeniser.CurrentToken <> ExpressionTokeniser_TokenType_RightParen Then
 				' Throw error
-				RuntimeError("')' expected at " + self.m_Tokeniser.CurrentPosition)
+				RuntimeError("')' expected at " + self._tokeniser.CurrentPosition)
 			EndIf
 			
-			Self.m_Tokeniser.GetNextToken()
+			Self._tokeniser.GetNextToken()
 			Return val
 			
 		EndIf
 		
 		' Keywords (big chunk of code)
-		If Self.m_Tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Keyword Then
+		If Self._tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Keyword Then
 			
-			p0 = self.m_Tokeniser.CurrentPosition 
+			p0 = self._tokeniser.CurrentPosition 
 			
-			Local functionOrPropertyName$	= Self.m_Tokeniser.TokenText
+			Local functionOrPropertyName$	= Self._tokeniser.TokenText
 			
 			Select Lower(functionOrPropertyName)
 				Case "if"		; Return Self.ParseConditional()
-				Case "true"		; Self.m_Tokeniser.GetNextToken() ; Return ScriptObjectFactory.NewBool(True)
-				Case "false"	; Self.m_Tokeniser.GetNextToken()  ; Return ScriptObjectFactory.NewBool(False)
+				Case "true"		; Self._tokeniser.GetNextToken() ; Return ScriptObjectFactory.NewBool(True)
+				Case "false"	; Self._tokeniser.GetNextToken()  ; Return ScriptObjectFactory.NewBool(False)
 			End Select
 			
 			' Switch off "ignore whitespace" as properties shouldn't contain spaces
-			'this\m_Tokeniser\IgnoreWhitespace = False
-			Self.m_Tokeniser.GetNextToken()
+			'this\_tokeniser\IgnoreWhitespace = False
+			Self._tokeniser.GetNextToken()
 			
 			Local args:TList	= New TList
 			Local isFunction%	= False
 			
 			' Get the current property or function name
-			If Self.m_Tokeniser.CurrentToken = ExpressionTokeniser_TokenType_DoubleColon Then
+			If Self._tokeniser.CurrentToken = ExpressionTokeniser_TokenType_DoubleColon Then
 				
 				' Function
 				isFunction = True		
 				functionOrPropertyName = functionOrPropertyName + "::"
-				Self.m_Tokeniser.GetNextToken()
+				Self._tokeniser.GetNextToken()
 				
 				' Check the :: is followed by a keyword
-				If Self.m_Tokeniser.CurrentToken <> ExpressionTokeniser_TokenType_Keyword Then
+				If Self._tokeniser.CurrentToken <> ExpressionTokeniser_TokenType_Keyword Then
 					RuntimeError("Function name expected")
 				EndIf
 				
-				functionOrPropertyName = functionOrPropertyName + Self.m_Tokeniser.TokenText
-				Self.m_Tokeniser.GetNextToken()
+				functionOrPropertyName = functionOrPropertyName + Self._tokeniser.TokenText
+				Self._tokeniser.GetNextToken()
 				
 			Else
 				
 				' Property
-				While(Self.m_Tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Dot Or Self.m_Tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Minus Or Self.m_Tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Keyword Or Self.m_Tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Number)
-					functionOrPropertyName = functionOrPropertyName + Self.m_Tokeniser.TokenText
-					Self.m_Tokeniser.GetNextToken()
+				While(Self._tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Dot Or Self._tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Minus Or Self._tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Keyword Or Self._tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Number)
+					functionOrPropertyName = functionOrPropertyName + Self._tokeniser.TokenText
+					Self._tokeniser.GetNextToken()
 				Wend
 				
 			EndIf
 			
 			' Switch whitespace back on
-			Self.m_Tokeniser.IgnoreWhitespace = True
+			Self._tokeniser.IgnoreWhitespace = True
 			
 			' If we're at a space, get the next token
-			If Self.m_Tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Whitespace Then
-				Self.m_Tokeniser.GetNextToken()
+			If Self._tokeniser.CurrentToken = ExpressionTokeniser_TokenType_Whitespace Then
+				Self._tokeniser.GetNextToken()
 			EndIf
 			
 			' -- Execute the function
@@ -634,11 +632,11 @@ Type ExpressionEvaluator
 			If isFunction Then
 				
 				' Check for opening bracket (for params)
-				If Self.m_Tokeniser.CurrentToken <> ExpressionTokeniser_TokenType_LeftParen Then
-					RuntimeError("'(' expected at " + self.m_Tokeniser.CurrentPosition)
+				If Self._tokeniser.CurrentToken <> ExpressionTokeniser_TokenType_LeftParen Then
+					RuntimeError("'(' expected at " + self._tokeniser.CurrentPosition)
 				EndIf
 				
-				Self.m_Tokeniser.GetNextToken()
+				Self._tokeniser.GetNextToken()
 				
 				' TODO: Fix function arguments
 				Local currentArgument%			= 0
@@ -649,7 +647,7 @@ Type ExpressionEvaluator
 '					RuntimeError("Function '" + functionOrPropertyName + "' not found")
 '				EndIf
 				
-				While (Self.m_Tokeniser.CurrentToken <> ExpressionTokeniser_TokenType_RightParen And Self.m_Tokeniser.CurrentToken <> ExpressionTokeniser_TokenType_EOF)
+				While (Self._tokeniser.CurrentToken <> ExpressionTokeniser_TokenType_RightParen And Self._tokeniser.CurrentToken <> ExpressionTokeniser_TokenType_EOF)
 					
 					If currentArgument > parameterCount Then
 						RuntimeError("Function ~q" + functionOrPropertyName + "~q -- Too many parameters")
@@ -658,12 +656,12 @@ Type ExpressionEvaluator
 					' Only parse if we have parameters
 					If parameterCount > 0 Then
 						
-						Local beforeArg%		= Self.m_Tokeniser.CurrentPosition
+						Local beforeArg%		= Self._tokeniser.CurrentPosition
 						Local e:ScriptObject	= Self.ParseExpression()
-						Local afterArg%			= self.m_Tokeniser.CurrentPosition
+						Local afterArg%			= self._tokeniser.CurrentPosition
 						
 						' Evaluate (will skip in parse only mode)
-						If self.m_EvalMode <> EXPRESSIONEVALUATOR_MODE_PARSEONLY Then 
+						If self._evalMode <> EXPRESSIONEVALUATOR_MODE_PARSEONLY Then 
 							
 							' Convert to the required param & add to the list of params 
 							Local convertedValue:ScriptObject	= e
@@ -678,16 +676,16 @@ Type ExpressionEvaluator
 					EndIf
 					
 					' Check if we're at the end
-					If Self.m_Tokeniser.CurrentToken = ExpressionTokeniser_TokenType_RightParen Then
+					If Self._tokeniser.CurrentToken = ExpressionTokeniser_TokenType_RightParen Then
 						Exit
 					EndIf
 					
 					' Check if there was no comma (syntax error)
-					If Self.m_Tokeniser.CurrentToken <> ExpressionTokeniser_TokenType_Comma Then
-						RuntimeError("',' expected at " + Self.m_Tokeniser.CurrentPosition + " -- found " + Self.m_Tokeniser.CurrentToken)
+					If Self._tokeniser.CurrentToken <> ExpressionTokeniser_TokenType_Comma Then
+						RuntimeError("',' expected at " + Self._tokeniser.CurrentPosition + " -- found " + Self._tokeniser.CurrentToken)
 					EndIf
 					
-					Self.m_Tokeniser.GetNextToken()
+					Self._tokeniser.GetNextToken()
 					
 				Wend
 				
@@ -695,16 +693,16 @@ Type ExpressionEvaluator
 					RuntimeError("Function ~q" + functionOrPropertyName + "~q -- Not enough parameters")
 				EndIf
 				
-				If Self.m_Tokeniser.CurrentToken <> ExpressionTokeniser_TokenType_RightParen Then
-					RuntimeError("')' expected at " + self.m_Tokeniser.CurrentPosition)
+				If Self._tokeniser.CurrentToken <> ExpressionTokeniser_TokenType_RightParen Then
+					RuntimeError("')' expected at " + self._tokeniser.CurrentPosition)
 				EndIf
 				
-				Self.m_Tokeniser.GetNextToken()
+				Self._tokeniser.GetNextToken()
 				
 			EndIf
 			
 			' Either run a function or get a property value
-			If self.m_EvalMode <> EXPRESSIONEVALUATOR_MODE_PARSEONLY Then 
+			If self._evalMode <> EXPRESSIONEVALUATOR_MODE_PARSEONLY Then 
 				If isFunction
 					Return Self.EvaluateFunction(functionOrPropertyName, args)
 				Else
@@ -724,7 +722,7 @@ Type ExpressionEvaluator
 	Method EvaluateFunction:ScriptObject(functionName:String, argList:TList)
 		
 		' Get the function object
-		Local func:ScriptFunction = scriptfunction(Self.m_RegisteredFunctions.ValueForKey(functionName))
+		Local func:ScriptFunction = scriptfunction(Self._registeredFunctions.ValueForKey(functionName))
 		If func = Null Then Throw "No handler found for function '" + functionName + "'"
 	
 		Return func.__invoke(argList)
@@ -732,7 +730,7 @@ Type ExpressionEvaluator
 	End Method
 	
 	Method EvaluateProperty:ScriptObject(propertyName:String)
-		Return ScriptObject(Self.m_Properties.ValueForKey(propertyName))
+		Return ScriptObject(Self._properties.ValueForKey(propertyName))
 	End Method
 	
 	
@@ -741,7 +739,7 @@ Type ExpressionEvaluator
 	' ------------------------------------------------------------
 	
 	Method _countFunctionParameters:Int(functionName:String)
-		Local func:ScriptFunction = scriptfunction(Self.m_RegisteredFunctions.ValueForKey(functionName))
+		Local func:ScriptFunction = scriptfunction(Self._registeredFunctions.ValueForKey(functionName))
 		If func = Null Then Throw "No handler found for function '" + functionName + "'"
 		
 		Return func.countFunctionParameters()
@@ -833,7 +831,7 @@ Type ExpressionEvaluator
 	' ------------------------------------------------------------
 	
 	Method _throwSyntaxError()
-		Throw "Syntax error in expression: + ~q" + Self.m_Tokeniser.getExpressionText() + "~q"
+		Throw "Syntax error in expression: + ~q" + Self._tokeniser.getExpressionText() + "~q"
 	End Method
 	
 	' ------------------------------------------------------------
@@ -843,22 +841,22 @@ Type ExpressionEvaluator
 	Function Create:ExpressionEvaluator(expression:String)
 		
 		Local this:ExpressionEvaluator	= New ExpressionEvaluator
-		this.m_Tokeniser	= ExpressionTokeniser.Create(expression)
+		this._tokeniser	= ExpressionTokeniser.Create(expression)
 		Return this
 		
 	End Function
 
 		' == debug
 	Method __dumpProperties()
-		For Local key:String = EachIn Self.m_Properties.Keys()
-			Print LSet(key, 20) + " => " + Self.m_Properties.ValueForKey(key).ToString()
+		For Local key:String = EachIn Self._properties.Keys()
+			Print LSet(key, 20) + " => " + Self._properties.ValueForKey(key).ToString()
 		Next
 	End Method
 	
 	Method New()
-		Self.m_RegisteredFunctions	= New TMap
-		Self.m_Properties			= New TMap
-		Self.m_EvalMode				= EXPRESSIONEVALUATOR_MODE_EVALUATE
+		Self._registeredFunctions	= New TMap
+		Self._properties			= New TMap
+		Self._evalMode				= EXPRESSIONEVALUATOR_MODE_EVALUATE
 	End Method
 	
 End Type
