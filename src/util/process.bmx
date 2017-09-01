@@ -12,80 +12,111 @@
 
 Import pub.freeprocess
 
+
 Type TProc Extends TProcess
+
+	' ------------------------------------------------------------
+	' -- Process Management
+	' ------------------------------------------------------------
+	
 	Method close:Int()
-		super.close()
-		terminate()
+		Super.close()
+		Self.terminate()
 	End Method
 
 	Method avail:Int()
 		Return err.bufferpos Or err.readavail() Or pipe.bufferpos Or pipe.readavail()
 	End Method
 	
+	
+	' ------------------------------------------------------------
+	' -- Reading Content
+	' ------------------------------------------------------------
+	
 	Method read:String()
-		If err.bufferpos > 0 Or err.readavail() > 0 Return err.ReadLine().Replace("~r","").Replace("~n","")
-		If pipe.bufferpos > 0 Or pipe.readavail() > 0 Return pipe.ReadLine().Replace("~r","").Replace("~n","")
+		If err.bufferpos > 0 Or err.readavail() > 0 Then
+			Return Self.cleanLine(err.ReadLine())
+		EndIf
+		If pipe.bufferpos > 0 Or pipe.readavail() > 0 then
+			Return Self.cleanLine(pipe.ReadLine())
+		EndIf
 	End Method
 
-	Method readpipe:String()
-		If pipe.bufferpos > 0 Or pipe.readavail() > 0 Return pipe.ReadLine().Replace("~r","").Replace("~n","")
+	Method readPipe:String()
+		If pipe.bufferpos > 0 Or pipe.readavail() > 0 Then 
+			Return Self.cleanLine(pipe.ReadLine())
+		EndIf
 	End Method
 	
-	Method readerr:String()
-		If err.bufferpos > 0 Or err.readavail() > 0 Return err.ReadLine().Replace("~r","").Replace("~n","")
+	Method readErr:String()
+		If err.bufferpos > 0 Or err.readavail() > 0 Then
+			Return Self.cleanLine(err.ReadLine())
+		EndIf
 	End Method
 	
-	Method pipeavail:Int()
+	Method pipeAvail:Int()
 		Return pipe.bufferpos Or pipe.readavail()
 	End Method
 	
-	Method erravail:Int()
+	Method errAvail:Int()
 		Return err.bufferpos Or err.readavail()
 	End Method
 	
 	Method Eof:Int()
-		If status() = 1 Return False
-		If pipe.readavail() > 0 Return False
-		If err.readavail() > 0 Return False
-		If pipe.bufferpos > 0 Return False
-		If err.bufferpos > 0 Return False
+		If status() = 1 Then Return False
+		If pipe.readavail() > 0 Then Return False
+		If err.readavail() > 0 Then Return False
+		If pipe.bufferpos > 0 Then Return False
+		If err.bufferpos > 0 Then Return False
 		Return True
 	End Method
 
-	Function Create:TProc(ncmd:String,nflags:Int)
-		Local temp_proc:TProc
-		Local infd,outfd,errfd	
+	''' <summary>Remove newlines from a string.</summary>
+	Method cleanLine:String(line:String)
+		Return line.Replace("~r", "").Replace("~n", "")
+	End Method
+	
+	
+	' ------------------------------------------------------------
+	' -- Construction / Destruction
+	' ------------------------------------------------------------
+	
+	Function Create:TProc(command:String, flags:Int)
 		
-		'do mac speciffic stuff
-		?MacOS
-		If FileType(ncmd)=2
-			ncmd :+ "/Contents/MacOS/" + StripExt(StripDir(ncmd))
+		Local infd:Int
+		Local outfd:Int
+		Local errfd:Int
+		
+		' MacOS only path helper
+		?MacOs
+		If FILETYPE_DIR = FileType(command) Then
+			command :+ "/Contents/MacOS/" + StripExt(StripDir(command))
 		EndIf
 		?
 		
-		'create the proc object
-		temp_proc = New TProc
+		' Create the new process and setup
+		Local temp_proc:TProc = New TProc
+		temp_proc.name = command
 		
-		'setup the proc
-		temp_proc.name = ncmd
+		' Attempt to start the process
+		temp_proc.handle = fdProcess(command, Varptr(infd), Varptr(outfd), Varptr(errfd), flags)
+		If Not(temp_proc.handle) Then Return Null
 		
-		'attempt to start the process
-		temp_proc.handle = fdProcess(ncmd,Varptr(infd),Varptr(outfd),Varptr(errfd),nflags)
-		If Not temp_proc.handle Return Null
+		' Create pipes
+		temp_proc.pipe = TPipeStream.Create(infd, outfd)
+		temp_proc.err = TPipeStream.Create(errfd, 0)
 		
-		'creat teh process pipes
-		temp_proc.pipe = TPipeStream.Create(infd,outfd)
-		temp_proc.err = TPipeStream.Create(errfd,0)
+		' Add this process to the global BlitzMax process list
+		If Not(ProcessList) Then
+			ProcessList = New TList
+		EndIf
+		ProcessList.AddLast(temp_proc)
 		
-		'add process to process list
-		If Not ProcessList ProcessList = New TList
-		ProcessList.AddLast temp_proc
-		
-		'return the proc object
 		Return temp_proc
 	End Function
+	
 End Type
 
 Function CreateProc:tproc(ncmd:String,nhidden:Int = True)
-	Return tproc.create(ncmd,nhidden)
+	Return TProc.Create(ncmd, nhidden)
 End Function

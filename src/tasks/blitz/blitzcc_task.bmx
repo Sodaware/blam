@@ -111,7 +111,7 @@ Type BlitzccTask Extends BuildTask
 		Local compileProcess:ProcessRunner = ProcessRunner.Create(command)
 		If compileProcess = Null Then Throw "Could not open blitzcc"
 		
-		While compileProcess.running()
+		While compileProcess.isRunning()
 			
 			compileProcess.update()
 			

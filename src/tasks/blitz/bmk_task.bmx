@@ -93,7 +93,7 @@ Type BmkTask Extends BuildTask
 		
 		Local success:Byte = True
 		
-		While compileProcess.running()
+		While compileProcess.isRunning()
 			
 			compileProcess.update()
 			

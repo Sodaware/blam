@@ -16,83 +16,80 @@ SuperStrict
 Import "process.bmx"
 
 Type ProcessRunner
-	
-	field m_Process:TProc
-	field m_TimeoutLimit:Int
-	field m_CurrentTimeout:int
-	
-	field m_Delta:int
-	Field m_StartTime:Int
-	
-	Field m_LineIn:String
-	Field m_ErrorIn:String
-	
-	method running:int()
-		return not(self.m_Process.Eof())
+
+	Field _process:TProc
+	Field _timeoutLimit:Int
+	Field _currentTimeout:Int
+
+	Field _delta:Int
+	Field _startTime:Int
+
+	Field _lineIn:String
+	Field _errorIn:String
+
+	Method isRunning:Byte()
+		Return Not(Self._Process.Eof())
 	End Method
-	
+
 	Method getNextLine:String()
-		self.update(0)
-		return self.getLine()
+		Self.update(0)
+		Return Self.getLine()
 	End Method
-	
+
 	Method getLine:String()
-		Return Self.m_LineIn
+		Return Self._lineIn
 	End Method
-	
+
 	Method getError:String()
-		Return Self.m_ErrorIn
+		Return Self._errorIn
 	End Method
-	
+
 	Method update(delayTime:int = 5)
-		
-		Self.m_LineIn = Self.m_Process.Read()
-		If Self.m_LineIn <> "" Then Self.m_CurrentTimeout = 0
-			
-		Self.m_ErrorIn = Self.m_Process.readerr()
+
+		Self._lineIn = Self._process.Read()
+		If Self._lineIn <> "" Then Self._currentTimeout = 0
+
+		Self._errorIn = Self._process.readerr()
 		?debug 
-		If Self.m_ErrorIn <> "" Then Print "ERROR: " + Self.m_ErrorIn
+		If Self._errorIn <> "" Then Print "ERROR: " + Self._errorIn
 		?
-		
-		
-			
+
 		' -- Adding a short delay here stops the app from stalling
 		' -- Without this, it takes 5 seconds. With, it takes 0.05
 		Delay(delayTime)
-			
+
 		' -- Used to check for timeouts			
-		self.m_Delta 	= MilliSecs() - self.m_StartTime
-		self.m_StartTime = MilliSecs()
-			
-		self.m_CurrentTimeout:+ self.m_Delta
-			
-		If self.m_CurrentTimeout > self.m_TimeoutLimit Then 
+		Self._delta 	= MilliSecs() - Self._startTime
+		Self._startTime = MilliSecs()
+
+		Self._currentTimeout:+ Self._delta
+
+		If Self._currentTimeout > Self._timeoutLimit Then 
 			Throw "Process timed out"
 		EndIf
 	End Method
-	
-	method stop()
-		self.m_Process.Close()
-	end Method
-	
+
+	Method stop()
+		Self._process.Close()
+	End Method
+
 	Function Create:ProcessRunner(command:String, timeout:int = 10000)
-		local this:ProcessRunner = new ProcessRunner
-		this.m_Process = createproc(command)
-		if this.m_Process = null then return null
-		
-		this.m_TimeoutLimit = timeout
-		this.m_StartTime 	= millisecs()
-		
+		Local this:ProcessRunner = New ProcessRunner
+		this._process = CreateProc(command)
+		If this._Process = Null Then Return Null
+
+		this._timeoutLimit = timeout
+		this._startTime 	= MilliSecs()
+
 		return this
 	End Function	
-	
-	
+
 	''' <summary>Adds quotes to a filename if required.</summary>
 	Function GetSafeName:String(fileName:String)
 		If Not(fileName.StartsWith("~q")) Then fileName = "~q" + fileName
 		If Not(fileName.EndsWith("~q")) Then fileName = fileName + "~q"
-		
+
 		Return fileName
 	End Function
-	
+
 End Type
