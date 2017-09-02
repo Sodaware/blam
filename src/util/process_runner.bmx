@@ -28,7 +28,7 @@ Type ProcessRunner
 	Field _errorIn:String
 
 	Method isRunning:Byte()
-		Return Not(Self._Process.Eof())
+		Return Not(Self._Process.endOfFile())
 	End Method
 
 	Method getNextLine:String()
@@ -50,7 +50,7 @@ Type ProcessRunner
 		If Self._lineIn <> "" Then Self._currentTimeout = 0
 
 		Self._errorIn = Self._process.readerr()
-		?debug 
+		?Debug
 		If Self._errorIn <> "" Then Print "ERROR: " + Self._errorIn
 		?
 
@@ -58,15 +58,16 @@ Type ProcessRunner
 		' -- Without this, it takes 5 seconds. With, it takes 0.05
 		Delay(delayTime)
 
-		' -- Used to check for timeouts			
-		Self._delta 	= MilliSecs() - Self._startTime
+		' -- Used to check for timeouts
+		Self._delta     = MilliSecs() - Self._startTime
 		Self._startTime = MilliSecs()
 
 		Self._currentTimeout:+ Self._delta
 
-		If Self._currentTimeout > Self._timeoutLimit Then 
+		If Self._currentTimeout > Self._timeoutLimit Then
 			Throw "Process timed out"
 		EndIf
+
 	End Method
 
 	Method stop()
@@ -79,10 +80,10 @@ Type ProcessRunner
 		If this._Process = Null Then Return Null
 
 		this._timeoutLimit = timeout
-		this._startTime 	= MilliSecs()
+		this._startTime    = MilliSecs()
 
-		return this
-	End Function	
+		Return this
+	End Function
 
 	''' <summary>Adds quotes to a filename if required.</summary>
 	Function GetSafeName:String(fileName:String)
