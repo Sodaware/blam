@@ -75,8 +75,8 @@ Type XmlBuildScriptSerializer extends BuildScriptSerializer
 					Local cmd:BuildCommand	= New BuildCommand
 					
 					' Load name / any text
-					cmd.m_Name		= commandNode.getName()
-					cmd.m_Value		= commandNode.GetText()
+					cmd._name		= commandNode.getName()
+					cmd._value		= commandNode.GetText()
 					
 					' Load attributes
 					If commandNode.getAttributeList() <> Null Then
@@ -110,8 +110,8 @@ Type XmlBuildScriptSerializer extends BuildScriptSerializer
 		
 		Local cmd:BuildCommand	= New BuildCommand
 					
-		cmd.m_Name		= node.getName()
-		cmd.m_Value		= node.GetText()
+		cmd._name		= node.getName()
+		cmd._value		= node.GetText()
 					
 		For Local ATT:TxmlAttribute	= EachIn node.getAttributeList()
 			if ATT then	cmd.addAttribute(ATT.getName(), ATT.getValue())
@@ -150,7 +150,7 @@ Type XmlBuildScriptSerializer extends BuildScriptSerializer
 		If child = Null Then Return
 	
 		' Check command has a child of this type
-		Local commandType:TTypeId = Self._findTaskType(cmd.m_Name)		
+		Local commandType:TTypeId = Self._findTaskType(cmd._name)		
 		If commandType = Null Then Return
 		
 		' Check command has a method for setting this type

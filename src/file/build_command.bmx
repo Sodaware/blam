@@ -16,57 +16,83 @@ Import brl.Map
 Import brl.retro
 
 Type BuildCommand
-	
-	Field m_Name:String
-	Field m_Value:String
-	
+
+	Field _name:String              '''< The name of the command (i.e. what task to call)
+	Field _value:String             '''< Optional value of the node. Usually empty.
+
 	' Location (used for error messages)
-	Field m_StartLine:Int
-	Field m_EndLine:Int
-	Field m_StartCol:Int
-	Field m_EndCol:Int
-	
-	Field m_Parameters:TMap
-	Field m_ChildElements:TList
-	
-'	Field m_FileNode.XML_Node
-'	Field m_Schema.CommandHandler
-	
-'	Field m_ParameterList%
-'	Field m_ChildElements%		;;; List of child elements
-	
-	Method hasChildren:Int()
-		Return (Self.m_ChildElements.Count() > 0)
+	Field _startLine:Int
+	Field _endLine:Int
+	Field _startCol:Int
+	Field _endCol:Int
+
+	Field _parameters:TMap
+	Field _childElements:TList
+
+
+	' ------------------------------------------------------------
+	' -- Getting Information
+	' ------------------------------------------------------------
+
+	Method getName:String()
+		Return Self._name
 	End Method
-	
+
+	Method hasChildren:Byte()
+		Return Not(Self._childElements.IsEmpty())
+	End Method
+
 	Method getChildren:TList()
-		Return Self.m_ChildElements
+		Return Self._childElements
 	End Method
+	
+	Method hasAttribute:Byte(name:String)
+		Return ( Self._parameters.valueForKey(name) <> Null )
+	End Method
+
+	Method getAttribute:String(name:String)
+		Return String(Self._parameters.ValueForKey(name))
+	End Method
+
+
+	' ------------------------------------------------------------
+	' -- Setting Internals
+	' ------------------------------------------------------------
 
 	Method addAttribute(name:String, value:String)
-		Self.m_Parameters.Insert(name, value)
-	End Method
-	
-	Method addChild(value:Object)
-		Self.m_ChildElements.AddLast(value)
+		Self._parameters.Insert(name, value)
 	End Method
 
-	Method New()
-		Self.m_Parameters = New TMap
-		Self.m_ChildElements = New TList
+	Method addChild(value:Object)
+		Self._childElements.AddLast(value)
 	End Method
-	
+
+
+	' ------------------------------------------------------------
+	' -- Debug Helpers
+	' ------------------------------------------------------------
+
 	Method __dump()
-		If Self.m_Value Then
-			Print "~t~t" + Self.m_Name + " [" + Self.m_Value + "]"
+		If Self._value Then
+			Print "~t~t" + Self._name + " [" + Self._value + "]"
 		Else
-			Print "~t~t" + Self.m_Name
+			Print "~t~t" + Self._name
 		EndIf	
-		
-		For Local param:String = EachIn Self.m_Parameters.Keys()
-			Print "~t~t~t" + LSet(param, 20) + " => " + String(Self.m_Parameters.ValueForKey(param))
+
+		For Local param:String = EachIn Self._parameters.Keys()
+			Print "~t~t~t" + LSet(param, 20) + " => " + String(Self._parameters.ValueForKey(param))
 		Next
-		
+
+	End Method
+
+
+	' ------------------------------------------------------------
+	' -- Construction / Destruction
+	' ------------------------------------------------------------
+
+	Method New()
+		Self._parameters = New TMap
+		Self._childElements = New TList
 	End Method
 
 End Type

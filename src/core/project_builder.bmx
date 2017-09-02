@@ -211,9 +211,9 @@ Type ProjectBuilder
 		Local taskManager:TaskManagerService = Self._getTaskManager()
 		
 		' Find the command handler
-		Local taskHandler:BuildTask	= taskManager.findTask(cmd.m_Name)
+		Local taskHandler:BuildTask	= taskManager.findTask(cmd.getName())
 		
-		If taskHandler = Null Then Throw "Command '" + cmd.m_Name + "' not found"
+		If taskHandler = Null Then Throw "Command '" + cmd.getName() + "' not found"
 		
 		Local taskType:TTypeId		= TTypeId.ForObject(taskhandler)
 		taskHandler._services		= Self._serviceManager
@@ -226,8 +226,8 @@ Type ProjectBuilder
 			If fld.Name().StartsWith("_") Or fld.Name().StartsWith("m_") Then Continue
 
 			' Get value for this field
-			If cmd.m_Parameters.valueForKey(fld.Name()) <> Null Then
-				Local val:String = String(cmd.m_Parameters.ValueForKey(fld.Name()))
+			If cmd.hasAttribute(fld.Name()) Then
+				Local val:String = String(cmd.getAttribute(fld.Name()))
 
 				' If contains expressions, parse it
 				If val.Contains("${") Then val = Self._parsePropertyValue(val)
@@ -267,7 +267,7 @@ Type ProjectBuilder
 		EndIf
 		
 		' -- Run this task
-		ConsoleUtil.currentTask = cmd.m_Name
+		ConsoleUtil.currentTask = cmd.getName()
 		taskHandler.execute()
 	
 	End Method
