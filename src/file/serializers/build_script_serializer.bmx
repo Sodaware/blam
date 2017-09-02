@@ -17,7 +17,7 @@ Import "../build_script.bmx"
 
 Type BuildScriptSerializer
 
-	Method canLoad:Int(fileName:String) Abstract
+	Method canLoad:Byte(fileName:String) Abstract
 	Method loadFile:BuildScript(fileName:String) Abstract
 
 End Type

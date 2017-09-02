@@ -19,8 +19,8 @@ Import "build_script_serializer.bmx"
 
 Type XmlBuildScriptSerializer extends BuildScriptSerializer
 	
-	Method canLoad:Int(fileName:String)
-		return (extractext(fileName).toLower() = "xml")
+	Method canLoad:Byte(fileName:String)
+		Return (ExtractExt(fileName).toLower() = "xml")
 	End Method
 
 	Method loadFile:BuildScript(fileName:String)
