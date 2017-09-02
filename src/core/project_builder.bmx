@@ -165,7 +165,7 @@ Type ProjectBuilder
 		Self._enterTarget(target)
 		
 		' -- Run each command
-		For Local cmd:BuildCommand = EachIn target.m_BuildCommands
+		For Local cmd:BuildCommand = EachIn target.getBuildCommands()
 			Self._runTargetCommand(cmd)
 		Next
 		

@@ -173,7 +173,7 @@ Type App
 		For Local target:BuildTarget = EachIn file.getTargets()
 			If target.isHidden() Then Continue
 			WriteC " " + LSet(target.getName(), longestString.Length)
-			WriteC "  " + target.m_Description
+			WriteC "  " + target.getDescription()
 			PrintC 
 		Next
 		

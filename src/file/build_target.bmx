@@ -20,95 +20,106 @@ Import "build_command.bmx"
 
 Type BuildTarget
 
-	Field m_Name:String					'''< The name of the target
-	Field m_DependsOn:String			'''< Any target this build target depends on
-	Field m_BuildCommands:TList			'''< List of BuildCommand objects in this target
-	Field m_LocalProperties:TMAP		'''< Hash of project properties
-	Field m_Description:String			'''< Description of what the target does
-	Field m_IsHidden:Byte				'''< Is this a "hidden" task (won't show in --list)
-	
-	
+	Field _name:String                  '''< The name of the target
+	Field _dependsOn:String             '''< Any target this build target depends on
+	Field _buildCommands:TList          '''< List of BuildCommand objects in this target
+	Field _localProperties:TMAP         '''< Hash of project properties
+	Field _description:String           '''< Description of what the target does
+	Field _isHidden:Byte                '''< Is this a "hidden" task (won't show in --list)
+
+
 	' ------------------------------------------------------------
 	' -- Public querying
 	' ------------------------------------------------------------
-	
+
 	''' <summary>Get the name of this target.</summary>
 	Method getName:String()
-		Return Self.m_Name
+		Return Self._name
 	End Method
-	
+
+	''' <summary>Get the description for this target.</summary>
+	Method getDescription:String()
+		Return Self._description
+	End Method
+
+	''' <summary>Is this task hidden? Hidden tasks don't show up in --list.</summary>
 	Method isHidden:Byte()
-		Return Self.m_IsHidden
+		Return Self._isHidden
 	End Method
-	
+
 	''' <summary>Check if the target has a local property.</summary>
-	''' <param name="propName">The name of the property to search for.</param>
+	''' <param name="propertyName">The name of the property to search for.</param>
 	''' <return>True if property exists, false if not.</return>
-	Method hasProperty:Int(propName:String)
-		Return (Self.m_LocalProperties.ValueForKey(propName) <> Null)
+	Method hasProperty:Byte(propertyName:String)
+		Return (Self._localProperties.ValueForKey(propertyName) <> Null)
 	End Method
-	
+
 	''' <summary>Get a list of target names that this target depends on.</summary>
 	''' <return>Array of target names.</return>
 	Method getDependencies:String[]()
-		
+
 		' Split dependencies into list
-		Local targets:String[] = Self.m_DependsOn.Split(",")
-		
+		Local targets:String[] = Self._dependsOn.Split(",")
+
 		' Remove spaces from target names
 		For Local i:Int = 0 To targets.Length - 1
 			targets[i] = Trim(targets[i])
 		Next
-		
+
 		Return targets
-		
+
 	End Method
-	
+
+	''' <summary>Get a list of all `BuildCommand` objects in this target.</summary>
+	Method getBuildCommands:TList()
+		Return Self._buildCommands
+	End Method
+
 	''' <summary>Gets the local properties for this target.</summary>
 	Method getLocalProperties:TMap()
-		Return Self.m_LocalProperties
+		Return Self._localProperties
 	End Method
-	
+
 	Method hasDependencies:Byte()
-		Return Self.m_DependsOn <> ""
+		Return Self._dependsOn <> ""
 	End Method
-	
-	
+
+
 	' ------------------------------------------------------------
 	' -- Public setters
 	' ------------------------------------------------------------
-	
+
 	Method addCommand(cmd:BuildCommand)
 		If cmd = Null Then Throw "Attempted to add an empty command"
-		Self.m_BuildCommands.AddLast(cmd)
+		Self._buildCommands.AddLast(cmd)
 	End Method
 
 	Method setProperty(name:String, value:String)
-		Self.m_LocalProperties.Insert(name, value)
+		Self._localProperties.Insert(name, value)
 	End Method
-	
-	
+
+
 	' ------------------------------------------------------------
 	' -- DEBUG
 	' ------------------------------------------------------------
-	
+
 	Method __dump()
-		Print "~tTarget: " + Self.m_Name
-		
-		For Local cmd:BuildCommand	= EachIn Self.m_BuildCommands
+		Print "~tTarget: " + Self._name
+
+		For Local cmd:BuildCommand	= EachIn Self._buildCommands
 			cmd.__dump()
 		Next
-		
+
 	End Method
-	
-	
+
+
 	' ------------------------------------------------------------
 	' -- Creation & Destruction
 	' ------------------------------------------------------------
-	
+
 	Method New()
-		Self.m_BuildCommands	= New TList
-		Self.m_LocalProperties	= New TMap
+		Self._buildCommands   = New TList
+		Self._localProperties = New TMap
 	End Method
-		
+
 End Type

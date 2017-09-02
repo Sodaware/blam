@@ -60,10 +60,10 @@ Type XmlBuildScriptSerializer extends BuildScriptSerializer
 			Local target:BuildTarget	= New BuildTarget
 			
 			' -- Target details
-			target.m_Name				= targetNode.getAttribute("name")
-			target.m_DependsOn			= targetNode.getAttribute("depends")
-			target.m_Description		= targetNode.getAttribute("description")
-			target.m_IsHidden			= Self._isTrue(targetNode.getAttribute("hidden"))
+			target._name				= targetNode.getAttribute("name")
+			target._dependsOn			= targetNode.getAttribute("depends")
+			target._description		= targetNode.getAttribute("description")
+			target._isHidden			= Self._isTrue(targetNode.getAttribute("hidden"))
 			
 			' -- Target commands
 			If targetNode.getChildren() <> Null And targetNode.getChildren().Count() > 0 Then
@@ -96,7 +96,7 @@ Type XmlBuildScriptSerializer extends BuildScriptSerializer
 				Next
 			EndIf
 				
-			script._buildTargets.Insert(target.m_Name, target)
+			script._buildTargets.Insert(target.getName(), target)
 		Next
 				
 		' Cleanup & return
