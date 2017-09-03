@@ -35,6 +35,11 @@ Type ServiceManager
 		Self._serviceLookup.Insert(TTypeId.ForObject(service), service)
 	End Method
 
+	''' <summary>Get a service by its name.</summary>
+	Method get:Service(name:String)
+		Return Self.getService(TTypeId.ForName(name))
+	End Method
+
 	''' <summary>Get a service by its type id.</summary>
 	''' <param name="serviceType">The TTypeId to find.</param>
 	Method getService:Service(serviceType:TTypeId)
