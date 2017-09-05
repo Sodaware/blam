@@ -45,10 +45,14 @@ Type SleepTask Extends BuildTask
 		delayTime = delayTime + (seconds * 1000)
 	
 		' Output
-		If verbose Then 
-			PrintC "Sleeping for " + hours + " hours, " + minutes + " minutes, " + seconds + " seconds and " + milliseconds + " milliseconds. Total time : " + delayTime
+		If verbose Then
+			Self.Log(..
+				"Sleeping for " + hours + " hours, " + minutes + " minutes, " + seconds + " seconds " + ..
+				" and " + milliseconds + " milliseconds. " + ..
+				"Total time : " + delayTime ..
+			)
 		Else
-			PrintC "Sleeping for " + delayTime + " milliseconds"
+			Self.Log("Sleeping for " + delayTime + " milliseconds")
 		EndIf
 	
 		' -- sleep

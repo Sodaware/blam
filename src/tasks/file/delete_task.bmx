@@ -42,7 +42,7 @@ Type DeleteTask Extends BuildTask
 		EndIf
 		
 		' Delete a fileset
-		If Self.filesets <> Null Then 
+		If Self.filesets <> Null Then
 			
 			Local fileCount:Int = 0
 			Local totalSize:Int = 0

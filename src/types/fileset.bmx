@@ -17,7 +17,7 @@ Import sodaware.file_fnmatch
 
 Import "base_type.bmx"
 
-Type Fileset Extends BaseType .. 
+Type Fileset Extends BaseType ..
 	{ name="fileset" }
 	
 	' Parameters
@@ -89,7 +89,7 @@ Type Fileset Extends BaseType ..
 		For Local pattern:String = EachIn Self.includes
 			If fnmatch(fileName, pattern) Then
 				Return True
-			End If	
+			End If
 		Next
 		
 		Return False

@@ -53,7 +53,7 @@ Type BuildTask
 		
 	End Method
 	
-	Method Log(message:String, logLevel:Int = LEVEL_INFO)
+	Method log(message:String, logLevel:Int = LEVEL_INFO)
 		
 		' Add colour codes
 		If logLevel = LEVEL_WARN Then

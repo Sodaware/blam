@@ -36,7 +36,7 @@ Type PropertyTask Extends BuildTask
 		' TODO: Add support for read only properties
 		' TODO: Add support for dynamic properties
 	
-		If Self.file Then 
+		If Self.file Then
 			Self._loadPropertyFile()
 		Else
 			Self._setProperty(Self.name, Self.value)

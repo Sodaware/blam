@@ -27,9 +27,11 @@ Type EchoTask Extends BuildTask
 	Method execute()
 		
 		' Check if writing to a file or console
-		If Self.file = "" Then .. 
-			Self._echoToConsole() Else .. 
+		If Self.file = "" Then
+			Self._echoToConsole()
+		Else
 			Self._echoToFile()
+		EndIf
 		
 	End Method
 	

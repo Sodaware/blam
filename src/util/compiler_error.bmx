@@ -19,7 +19,7 @@ Type CompilerError
 	Field Column:Int
 	Field Message:String
 	
-	Method ToString:String()
+	Method toString:String()
 		Return "Error in file ~q" + Self.File + "~q (Line " + Self.Line + ", Column " + Self.Column + ")" ..
 			+ "~n" + Self.Message
 	End Method
