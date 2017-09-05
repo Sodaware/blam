@@ -49,3 +49,23 @@ Type FileLoadException Extends TBlitzException
 		Return exception
 	End Function
 End Type
+
+Type MissingTargetException Extends TBlitzException
+
+	Field _targetName:String
+
+	Method toString:String()
+		If Self._targetName Then
+			Return "Target ~q" + Self._targetName + "~q not found."
+		Else
+			Return "Invalid target name specified"
+		EndIf
+	End Method
+
+	Function Create:MissingTargetException(targetName:String)
+		Local exception:MissingTargetException = New MissingTargetException
+		exception._targetName = targetName
+		Return exception
+	End Function
+
+End Type

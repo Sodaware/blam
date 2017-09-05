@@ -150,7 +150,7 @@ Type ProjectBuilder
 		If targetName = "" Then targetName = Self._target
 		
 		Local target:BuildTarget = Self._buildScript.getTarget(targetName)
-		If target = Null Then Throw "Target ~q" + targetName + "~q not found."
+		If target = Null Then Throw MissingTargetException.Create(targetName)
 		
 		' -- Check if target has any dependencies
 		If target.hasDependencies() Then
@@ -185,7 +185,7 @@ Type ProjectBuilder
 	Method _enterTarget(target:BuildTarget)
 		
 		' Check target is valid
-		If target = Null Then Throw "Attempt to execute invalid target"
+		If target = Null Then Throw MissingTargetException
 		
 		' TODO: Add option to hide or colorize this
 		' Show target
