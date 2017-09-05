@@ -19,6 +19,7 @@ Import brl.reflection
 Import brl.retro
 
 ' -- Application level
+Import "exceptions.bmx"
 Import "../service_manager.bmx"
 Import "../services/task_manager/task_manager_service.bmx"
 
@@ -62,7 +63,7 @@ Type ProjectBuilder
 	
 	Field _serviceManager:ServiceManager    '''< Services
 
-	Field _buildScript:BuildScript          '''< The script to execute. 
+	Field _buildScript:BuildScript          '''< The script to execute.
 	Field _buildLog:BuildLogger             '''< The build log for the script
 	
 	Field _target:String                    '''< The target to execute
@@ -106,7 +107,7 @@ Type ProjectBuilder
 	
 	''' <summary>Set the build target to execute.</summary>
 	''' <param name="target">Name of the target to execute.</param>
-	Method setTarget(target:String)		
+	Method setTarget(target:String)
 		' TODO: Check the target can be found
 		Self._target = target
 	End Method
@@ -323,7 +324,7 @@ Type ProjectBuilder
 	''' expressions and functions within the property.
 	''' </summary>
 	''' <param name="val">The value to parse</param>
-	''' <return>The parsed value.</return> 
+	''' <return>The parsed value.</return>
 	Method _parsePropertyValue:String(val:String)
 			
 		Local propertyValue:String = val
@@ -331,7 +332,7 @@ Type ProjectBuilder
 			
 			Local myExp:String = Mid(propertyValue, Instr(propertyValue, "${") + 2, Instr(propertyValue, "}") - Instr(propertyValue, "${") - 2)
 			
-			If Instr(propertyValue, "}") < 1 Then 
+			If Instr(propertyValue, "}") < 1 Then
 				Throw "Missing closing brace in expression ~q" + propertyValue + "~q"
 			EndIf
 			
@@ -345,7 +346,7 @@ Type ProjectBuilder
 				' -- Add functions
 				eval.__autoload(Self._buildScript)
 				
-				' -- Add properties			
+				' -- Add properties
 				eval.addProperties(Self._buildScript.getGlobalProperties())
 				eval.addProperties(Self._buildScript.getCurrentTargetProperties())
 								
