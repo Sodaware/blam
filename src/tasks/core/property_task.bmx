@@ -16,6 +16,7 @@ Import sodaware.File_INI
 Import sodaware.Console_Color
 
 Import "../build_task.bmx"
+Import "../../core/exceptions.bmx"
 
 Type PropertyTask Extends BuildTask
 	
@@ -53,7 +54,7 @@ Type PropertyTask Extends BuildTask
 		' TODO: Check file can be found and throw error (if required)
 		
 		Local ini:File_Ini	= file_ini.LoadFile(Self.file)
-		If ini = Null Then Throw "Could not load property file: " + Self.file
+		If ini = Null Then Throw FileLoadException.Create("Could not load property file: " + Self.file)
 		
 		For Local grp:TIniSection = EachIn ini.Sections._Sections
 			

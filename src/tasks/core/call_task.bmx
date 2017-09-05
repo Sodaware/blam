@@ -12,6 +12,7 @@
 
 SuperStrict
 
+Import "../../core/exceptions.bmx"
 Import "../build_task.bmx"
 
 Type CallTask Extends BuildTask
@@ -19,7 +20,7 @@ Type CallTask Extends BuildTask
 	Field target:String
 	
 	Method execute()
-		Throw "Task not implemented yet"
+		Throw New TaskNotImplementedException
 	End Method
 	
 End Type

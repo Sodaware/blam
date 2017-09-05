@@ -14,6 +14,7 @@
 SuperStrict
 
 Import "process.bmx"
+Import "../core/exceptions.bmx"
 
 Type ProcessRunner
 
@@ -65,7 +66,7 @@ Type ProcessRunner
 		Self._currentTimeout:+ Self._delta
 
 		If Self._currentTimeout > Self._timeoutLimit Then
-			Throw "Process timed out"
+			Throw New ProcessTimeoutException
 		EndIf
 
 	End Method

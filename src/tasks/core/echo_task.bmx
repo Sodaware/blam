@@ -13,6 +13,7 @@
 SuperStrict
 
 Import "../../util/console_util.bmx"
+Import "../../core/exceptions.bmx"
 
 Import "../build_task.bmx"
 
@@ -52,15 +53,19 @@ Type EchoTask Extends BuildTask
 		Local fileOut:TStream
 	
 		' -- Open the file to write
-		If Self.append = True Then 
-			If FileType(Self.file) <> FILETYPE_FILE Then Throw "Could not open file '" + Self.file + "'"
+		If Self.append = True Then
+			If FileType(Self.file) <> FILETYPE_FILE Then
+				Throw FileLoadException.Create("Could not open file '" + Self.file + "'")
+			EndIf
 			fileOut = OpenFile(Self.file)
-		Else 
+		Else
 			fileOut = WriteFile(Self.file)
 		EndIf
 		
 		' Check
-		If fileOut = Null Then Throw "Error in opening log file '" + Self.file + "'"
+		If fileOut = Null Then
+			Throw FileLoadException.Create("Error in opening log file '" + Self.file + "'")
+		EndIf
 		
 		' Write
 		fileOut.WriteLine(Self.message)
