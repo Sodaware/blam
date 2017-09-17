@@ -186,7 +186,7 @@ Type ProjectBuilder
 	Method _enterTarget(target:BuildTarget)
 		
 		' Check target is valid
-		If target = Null Then Throw MissingTargetException
+		If target = Null Then Throw New MissingTargetException
 		
 		' TODO: Add option to hide or colorize this
 		' Show target
