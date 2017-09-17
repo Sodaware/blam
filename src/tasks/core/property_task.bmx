@@ -50,20 +50,16 @@ Type PropertyTask Extends BuildTask
 	' ------------------------------------------------------------
 	
 	Method _loadPropertyFile()
-		
-		' TODO: Check file can be found and throw error (if required)
-		
-		Local ini:File_Ini	= file_ini.LoadFile(Self.file)
+
+		Local ini:IniFile = File_Ini.LoadFile(Self.file)
 		If ini = Null Then Throw FileLoadException.Create("Could not load property file: " + Self.file)
-		
-		For Local grp:TIniSection = EachIn ini.Sections._Sections
-			
-			For Local keyName:String = EachIn grp.Values.Keys()
-				Self._setProperty(grp.name + "." + keyName, grp.GetValue(keyName))
+
+		For Local section:IniFileSection = EachIn ini.getSections()
+			For Local keyName:String = EachIn section.getKeyNames()
+				Self._setProperty(section.getName() + "." + keyName, section.getValue(keyName))
 			Next
-		
 		Next
-		
+
 	End Method
-		
+
 End Type
