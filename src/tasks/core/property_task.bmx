@@ -25,6 +25,7 @@ Type PropertyTask Extends BuildTask
 	Field dynamic:Int	= False				'''< [optional] If true, will parse property when used. Otherwise will parse when set.
 	Field file:String	= ""				'''< [optional] If true, will load properties from an INI file.
 	Field readonly:Int	= False				'''< [optional] If true, will mark the property as read only.
+	Field required:Byte = True				'''< [optional] If true, will fail if the property file is not found.
 	
 	
 	' ------------------------------------------------------------
@@ -52,7 +53,12 @@ Type PropertyTask Extends BuildTask
 	Method _loadPropertyFile()
 
 		Local ini:IniFile = File_Ini.LoadFile(Self.file)
-		If ini = Null Then Throw FileLoadException.Create("Could not load property file: " + Self.file)
+		If ini = Null Then
+			If Self.required Then
+				Throw FileLoadException.Create("Could not load property file: " + Self.file)
+			EndIf
+			Return
+		EndIf
 
 		For Local section:IniFileSection = EachIn ini.getSections()
 			For Local keyName:String = EachIn section.getKeyNames()
