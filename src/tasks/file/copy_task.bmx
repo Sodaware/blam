@@ -23,7 +23,7 @@ Type CopyTask Extends BuildTask
 	Field todir:String                      '''< The directory to copy the file/files to.
 	Field overwrite:Byte    = False         '''< If true will overwrite any files
 	Field files:Fileset	                    '''< [optional] List of files to copy.
-	Field verbose:Int       = False         '''< [optional] Show verbose output
+	Field verbose:Byte      = False         '''< [optional] Show verbose output
 
 
 	' ------------------------------------------------------------
