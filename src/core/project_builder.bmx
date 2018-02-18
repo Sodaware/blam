@@ -371,7 +371,7 @@ Type ProjectBuilder
 	Function _setTaskProperty(fieldType:TField, handler:BuildTask, taskValue:Object)
 		
 		' Convert boolean values
-		If fieldType.TypeId().name().tolower() = "int" Then
+		If fieldType.TypeId().name().tolower() = "int" Or fieldType.TypeId().name().tolower() = "byte" Then
 			If taskValue.ToString().ToLower() = "true" Then taskValue = String(1)
 			If taskValue.ToString().ToLower() = "false" Then taskValue = String(0)
 		EndIf
