@@ -18,15 +18,16 @@ Import sodaware.Console_CommandLine
 
 Type ConsoleOptions Extends CommandLineOptions
 
-	Field NoLogo:Int	= False				{ Description="Hides the copyright notice" ShortName="n" }
+	Field NoLogo:Int	= False				{ Description="Hides the copyright notice" LongName="nologo" ShortName="n" }
 	Field File:String	= ""				{ Description="The build file to use" LongName="file-name" ShortName="f"  }
 	Field Target:String = ""				{ Description="The build target to use" ShortName="t" }
 	
-	Field Silent:Int	= False				{ Description="Supresses output to the console" ShortName="s" }
+	Field Silent:Int	= False				{ Description="Supresses output to the console" LongName="silent" ShortName="s" }
 	Field Prop:TMap		= New tmap			{ Description="Properties to send to the project" }
-	Field Verbose:Int   = False				{ Description="Show lots of stuff" ShortName="v" }
-	
-	Field List:Byte		= False				{ Description="List all available targets in buildfile" ShortName="l"}
+	Field Verbose:Int   = False				{ Description="Enable verbose output" LongName="verbose" ShortName="v" }
+    Field Bland:Byte    = False             { Description="Disable colourized output" LongName="bland" ShortName="b" }
+
+	Field List:Byte		= False				{ Description="List all available targets in buildfile" LongName="list" ShortName="l"}
 	
 	Field Help:Int		= False
 	

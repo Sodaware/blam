@@ -48,7 +48,12 @@ Type App
 	
 		' -- Setup the app
 		Self._setup()
-		
+
+        ' -- Setup output options.
+        If Self._options.Bland Then
+            Console_Color_DisableFormatting()
+        End If
+
 		' -- Show application header (if not hidden)
 		If Not(Self._options.NoLogo) Then Self.writeHeader()
 		
