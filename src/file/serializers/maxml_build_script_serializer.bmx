@@ -31,7 +31,9 @@ Type MaxmlBuildScriptSerializer extends BuildScriptSerializer
 		Local fileIn:xmlDocument = xmlDocument.Create(fileName)
 		Local root:xmlNode       = fileIn.Root()
 
-		If root.ChildList.Count() = 0 Then Return Null
+		If root.ChildList.Count() = 0 Then
+			Throw "Build file contains no targets or properties"
+		End If
 
 		' File and project info
 		script._filePath      = fileName
@@ -43,10 +45,7 @@ Type MaxmlBuildScriptSerializer extends BuildScriptSerializer
 			If taskNode.name = "target" Then Continue
 
 			' TODO: Check if it's a command or a type
-			' TODO: Move this to a single function (as command can appear in target as well)
-			Local cmd:BuildCommand = Self._loadCommand(taskNode)
-
-			script.addGlobalCommand(cmd)
+			script.addGlobalCommand(Self._loadCommand(taskNode))
 		Next
 
 		' Load all target nodes
@@ -62,35 +61,9 @@ Type MaxmlBuildScriptSerializer extends BuildScriptSerializer
 			target._isHidden    = Self._isTrue(Self._attributeValue(targetNode, "hidden"))
 
 			' -- Target commands
-			If targetNode.childList <> Null And targetNode.childList.Count() > 0 Then
-
-				' Load each command
-				For Local commandNode:xmlNode = EachIn targetNode.childList
-
-					' Create command to hold this
-					Local cmd:BuildCommand = New BuildCommand
-
-					' Load name / any text
-					cmd._name  = commandNode.name
-					cmd._value = commandNode.value
-
-					' Load attributes
-					If commandNode.attributeList <> Null Then
-						For Local ATT:xmlAttribute	= EachIn commandNode.attributeList
-							If ATT <> Null Then cmd.addAttribute(ATT.Name, ATT.Value)
-						Next
-					EndIf
-
-					' -- Load child types
-					If commandNode.childlist <> Null Then
-						For Local childNode:xmlNode = EachIn commandNode.childList
-							Self._addChildToCommand(cmd, Self._loadChild(childNode))
-						Next
-					End If
-
-					target.addCommand(cmd)
-				Next
-			EndIf
+			For Local commandNode:xmlNode = EachIn targetNode.childList
+				target.addCommand(Self._loadCommand(commandNode))
+			Next
 
 			script._buildTargets.Insert(target.getName(), target)
 		Next
@@ -107,9 +80,12 @@ Type MaxmlBuildScriptSerializer extends BuildScriptSerializer
 		cmd._value = node.value
 
 		For Local attribute:xmlAttribute = EachIn node.attributeList
-			If attribute Then
-				cmd.addAttribute(attribute.name, attribute.value)
-			End If
+			cmd.addAttribute(attribute.name, attribute.value)
+		Next
+
+		' -- Load child types
+		For Local childNode:xmlNode = EachIn node.childList
+			Self._addChildToCommand(cmd, Self._loadChild(childNode))
 		Next
 
 		Return cmd
@@ -123,22 +99,17 @@ Type MaxmlBuildScriptSerializer extends BuildScriptSerializer
 		child.Name = node.Name
 
 		' Add attributes
-		If node.attributeList <> Null Then
-			For Local ATT:xmlAttribute = EachIn node.attributeList
-				If ATT <> Null Then child.setAttribute(ATT.Name, ATT.Value)
-			Next
-		EndIf
+		For Local attribute:xmlAttribute = EachIn node.attributeList
+			child.setAttribute(attribute.Name, attribute.Value)
+		Next
 
-		If node.childList <> Null Then
-			For Local childNode:xmlNode = EachIn node.childList
-				child.addChild(Self._loadChild(childNode))
-			Next
-		EndIf
+		For Local childNode:xmlNode = EachIn node.childList
+			child.addChild(Self._loadChild(childNode))
+		Next
 
 		Return child
 
 	End Method
-
 
 	Method _addChildToCommand(cmd:BuildCommand, child:BuildNode)
 
