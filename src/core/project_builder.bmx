@@ -60,6 +60,7 @@ Import "../types/fileset.bmx"
 Import "../types/filter_chain.bmx"
 
 ' -- FILTERS!
+Import "../filters/head_filter.bmx"
 Import "../filters/replace_tokens_filter.bmx"
 
 
