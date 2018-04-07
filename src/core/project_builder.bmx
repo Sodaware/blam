@@ -50,6 +50,7 @@ Import "../tasks/file/zip_task.bmx"
 
 ' -- FUNCTIONS!
 Import "../functions/environment_functions.bmx"
+Import "../functions/date_functions.bmx"
 Import "../functions/directory_functions.bmx"
 Import "../functions/version_functions.bmx"
 Import "../functions/project_functions.bmx"
