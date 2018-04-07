@@ -12,31 +12,46 @@
 
 SuperStrict
 
-import brl.map
+Import sodaware.stringtable
 import brl.linkedlist
 
 Type BuildNode
-	
-	field Name:String
-	field Contents:String
-	Field Attributes:TMap
-	field Children:TList
-	
-	Method setAttribute(name:String, val:String)
-		self.Attributes.Insert(name, val)
+
+	Field Name:String
+	Field Contents:String
+	Field Attributes:StringTable
+	Field Children:TList
+
+	' ------------------------------------------------------------
+	' -- Getting and setting attributes
+	' ------------------------------------------------------------
+
+	Method getAttribute:String(name:String)
+		Return Self.Attributes.get(name)
 	End Method
-	
+
+	Method setAttribute:BuildNode(name:String, value:String)
+		Self.Attributes.set(name, value)
+		Return Self
+	End Method
+
+
+	' ------------------------------------------------------------
+	' -- Child Elements
+	' ------------------------------------------------------------
+
 	Method addChild(child:BuildNode)
 		Self.Children.AddLast(child)
 	End Method
-	
+
+
+	' ------------------------------------------------------------
+	' -- Construction
+	' ------------------------------------------------------------
+
 	Method New()
-		Self.Attributes	= new TMap
+		Self.Attributes	= new StringTable
 		Self.Children	= new TList
 	End Method
-	
-	Method getAttribute:String(name:String)
-		Return String(Self.Attributes.ValueForKey(Name))
-	End Method
-	
+
 End Type
