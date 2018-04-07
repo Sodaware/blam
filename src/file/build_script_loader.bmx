@@ -19,7 +19,7 @@ Import "build_script.bmx"
 
 ' TODO: Import all serializers here, or in the main app?
 Import "serializers/build_script_serializer.bmx"
-Import "serializers/xml_build_script_serializer.bmx"
+Import "serializers/maxml_build_script_serializer.bmx"
 
 Type BuildScriptLoader
 	
@@ -31,7 +31,7 @@ Type BuildScriptLoader
 		If FileType(fileName) <> FILETYPE_FILE Then Throw "Build script file not found!"
 		
 		' Get all serializers
-		Local serializerBaseType:TTypeId	= TTypeId.ForName("BuildScriptSerializer")
+		Local serializerBaseType:TTypeId = TTypeId.ForName("BuildScriptSerializer")
 		
 		' Attempt to load file with each serializer - return as soon as it succeeds
 		For Local serializerType:TTypeId = EachIn serializerBaseType.DerivedTypes()
