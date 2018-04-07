@@ -15,5 +15,5 @@ SuperStrict
 Import "../file/build_node.bmx"
 
 Type BaseType
-	
+	Field _builder:Object
 End Type

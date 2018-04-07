@@ -56,6 +56,10 @@ Import "../functions/project_functions.bmx"
 
 ' -- TYPES!
 Import "../types/fileset.bmx"
+Import "../types/filter_chain.bmx"
+
+' -- FILTERS!
+Import "../filters/replace_tokens_filter.bmx"
 
 
 ''' <summary>A project builder.</summary>
@@ -273,7 +277,7 @@ Type ProjectBuilder
 	
 	End Method
 	
-	''' <summary>Create a BaseType object fron a build node.</summary>
+	''' <summary>Create a BaseType object from a build node.</summary>
 	''' <param name="node">The BuildNode object to create a type instance for.</param>
 	''' <returns>A BaseType child instance.</returns>
 	Method _createTypeFromBuildNode:BaseType(node:BuildNode)
@@ -302,16 +306,22 @@ Type ProjectBuilder
 			
 		Next
 		
-		' Set children
+		' Set child elements of a build task. Looks for a named setter method
+		' first, but will use setChild as a fallback.
+
+		' E.g. a <filterchain> node with a <replacetokens> child will look for a
+		' 'setreplacetokens' method. If that doesn't exist, it will attempt to
+		' use `setChildren`.
 		For Local childNode:BuildNode = EachIn node.Children
-			
-			' Set each child (if it has a setter)
 			Local setMethodName:String	= "set" + childNode.Name.ToLower()
-			
+
 			If childType.FindMethod(setMethodName) Then
 				childType.FindMethod(setMethodName).Invoke(child, [childNode])
+			ElseIf childType.findMethod("setChild") Then
+				child._builder = self
+				childType.FindMethod("setChild").Invoke(child, [childNode])
 			Else
-				Print "Could not find setter: " + node.Name
+				Print "Could not find setter for child: " + node.Name
 			End If
 		Next
 		
