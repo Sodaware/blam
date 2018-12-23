@@ -227,7 +227,7 @@ Type ProjectBuilder
 		taskHandler._project		= Self._buildScript
 
 		' Set build target fields
-		For Local fld:TField = EachIn taskType.Fields()
+		For Local fld:TField = EachIn taskType.Fields().Values()
 
 			' Skip private fields
 			If fld.Name().StartsWith("_") Or fld.Name().StartsWith("m_") Then Continue
@@ -338,7 +338,6 @@ Type ProjectBuilder
 	''' <param name="val">The value to parse</param>
 	''' <return>The parsed value.</return>
 	Method _parsePropertyValue:String(val:String)
-			
 		Local propertyValue:String = val
 		While Instr(propertyValue, "${") > 0
 			
