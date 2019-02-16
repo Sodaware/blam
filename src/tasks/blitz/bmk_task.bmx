@@ -52,35 +52,46 @@ Type BmkTask Extends BuildTask
 		' TODO: Add support for module compilation
 		' TODO: Add support for handling "cannot open output file" error
 
-		' -- Get configuration
+		' Get configuration.
+		' TODO: Can this go somewhere else?
 		Self._config = ConfigurationService(Self._getService("ConfigurationService"))
 
-		' -- Check the input file/mod is valid
+		' Check the input file/module is valid.
 		Self._verifyInput()
 
-		' -- Remove .exe from output path if compiling on Linux/Mac
+		' Remove .exe from output path if compiling on Linux/Mac.
 		Self._fixOutputExtension()
 
-		' -- Create compiler command
+		' Create compilation command and add the full path to BMK.
 		Local command:String = ProcessRunner.GetSafeName(Self._getCompilerPath())
 
-		' -- Add action (makemod or makeapp)
+		' Add action (makemods or makeapp).
 		Select Self.action
-			Case "makeapp"	; command:+ " makeapp"
-			Case "makemods"	; command:+ " makemods"
+			Case "makeapp"	; command :+ " makeapp"
+			Case "makemods"	; command :+ " makemods"
+
+			' TODO: Use a proper exception here.
 			Default			; Throw "Unknown command: '" + Self.action + "'"
 		End Select
 
-		' -- Add options
-		If Self.rebuild Then command:+ " -a"
-		If Self.action = "makeapp" then
-			if Self.Debug Then command:+ " -d" else command:+ " -r"
-		EndIf
-		If Self.threaded Then command:+ " -h"
-		If Self.GUI Then command:+ " -t gui"
-		If Self.action = "makeapp" And Self.output Then command:+ " -o " + ProcessRunner.GetSafeName(Self.output)
+		' Add optional arguments.
+		command :+ Self._addCommandOption(Self.rebuild, "-a")
+		command :+ Self._addCommandOption(Self.threaded, "-h")
+		command :+ Self._addCommandOption(Self.gui, "-t gui")
 
-		' -- Add input (either a file or a mod name)
+		' Add application only options.
+		If Self.action = "makeapp" Then
+			' Add debug/release switches.
+			command :+ Self._addCommandOption(Self.Debug, "-d")
+			command :+ Self._addCommandOption(Not Self.Debug, "-r")
+
+			' Add output path.
+			If Self.output <> "" Then
+				command :+ " -o " + ProcessRunner.GetSafeName(Self.output)
+			End If
+		End If
+
+		' Add source (either a file or a mod name)
 		command:+ " " + ProcessRunner.GetSafeName(Self.source)
 
 		Local fileCount:Int		= 0
@@ -216,7 +227,11 @@ Type BmkTask Extends BuildTask
 		compileProcess.stop()
 
 		If success Then
-			Self.Log("Compilation success - output size " + FileSize(Self.output))
+			Local message:String = "Compilation success"
+			If Self.isBuildingApplication() Then
+				message :+ " - output size " + FileSize(Self.output)
+			End If
+			Self.Log(message)
 		Else
 			Self.Log("Compilation failed")
 		EndIf
@@ -232,6 +247,20 @@ Type BmkTask Extends BuildTask
 	' ------------------------------------------------------------
 	' -- Internal helpers
 	' ------------------------------------------------------------
+
+	''' <summary>Check if building an application.</summary>
+	Method isBuildingApplication:Byte()
+		Return Self.action = "makeapp"
+	End Method
+
+	''' <summary>Check if building a module.</summary>
+	Method isBuildingModule:Byte()
+		Return Self.action <> "makeapp"
+	End Method
+
+	Method _addCommandOption:String(test:Int, option:String)
+		If test Then Return " " + option
+	End Method
 
 	''' <summary>Parses an array of strings to find compiler errors.</summary>
 	Method _getCompilerError:CompilerError(errorLines:String[])
@@ -276,14 +305,13 @@ Type BmkTask Extends BuildTask
 		?
 	End Method
 
+	' Check path exists. Throw an exception if not.
 	Method _verifyInput()
-
-		If Self.action = "makemods" Then
-			If FileType(Self._getModPath()) <> FILETYPE_DIR Then Throw "Mod '" + Self._getModPath() + "' not found"
-		Else
+		If Self.isBuildingApplication()
 			If FileType(Self.source) <> FILETYPE_FILE Then Throw "File '" + Self.source + "' not found"
+		Else
+			If FileType(Self._getModPath()) <> FILETYPE_DIR Then Throw "Mod '" + Self._getModPath() + "' not found"
 		End If
-
 	End Method
 
 	Method _getModPath:String()
