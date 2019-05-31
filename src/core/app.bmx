@@ -92,8 +92,8 @@ Type App
 	''' <summary>Executes the selected build script & target.</summary>
 	Method _execute()
 
-		Local buildFile:String	= Self._options.File
-		If buildFile = "" Then buildFile = File_Util.PathCombine(LaunchDir, "build.xml")
+		' Get the build file name.
+		Local buildFile:String = Self._getBuildfilePath()
 
 		PrintC("Build file: %w" + buildFile + "%n~n")
 
@@ -210,7 +210,28 @@ Type App
 				longestString = target.getName()
 			End If
 		Next
+
 		Return longestString
+	End Method
+
+	''' <summary>Get the full path to the build file.</summary>
+	Method _getBuildfilePath:String()
+
+		' Get path from options. May be blank.
+		Local buildFile:String = Self._options.File
+
+		' If no build file was passed in, search for "build.xml" and "blam.xml"
+		' in the current directory.
+		If buildFile = "" Then
+			buildFile = File_Util.PathCombine(LaunchDir, "build.xml")
+
+			' Fallback to "blam.xml"
+			If FileType(buildFile) = False Then
+				buildFile = File_Util.PathCombine(LaunchDir, "blam.xml")
+			End If
+		End If
+
+		Return buildFile
 	End Method
 
 
