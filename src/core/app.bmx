@@ -97,38 +97,36 @@ Type App
 
 		PrintC("Build file: %w" + buildFile + "%n~n")
 
-		' -- Load the build file
+		' Load the build file.
 		Local script:BuildScript = BuildScriptLoader.LoadScript(buildFile)
 
-		' -- Create a project builder
-		Local builder:ProjectBuilder = New ProjectBuilder
-
-		' -- Populate its options
-		builder.setServiceManager(Self._services)
-
-		' - Set build file
-		builder.setScript(script)
-
-		' - List?
+		' List targets and quit if user requested them.
 		If Self._options.List Then
 			Self.listTargets(script)
 			Return
 		End If
 
-		' - Set build target
-		If Self._options.Target <> "" Then	builder.setTarget(Self._options.Target)
-		If Self._options.Target = "" And Self._options.countarguments() > 0 Then
-			builder.setTarget(Self._options.GetArgument(0))
+		' Create and configure project builder.
+		Local builder:ProjectBuilder = ProjectBuilder.Create(script)
+		builder.setServiceManager(Self._services)
+
+		' Set build target.
+		If Self._options.Target <> "" Then
+			builder.setTarget(Self._options.Target)
 		End If
 
-		' - Add properties from the command line
+		If Self._options.Target = "" And Self._options.countArguments() > 0 Then
+			builder.setTarget(Self._options.getArgument(0))
+		End If
+
+		' Add properties from the command line.
 		If Self._options.Prop <> Null Then
 			For Local item:String = EachIn Self._options.Prop.Keys()
 				builder.setGlobalProperty(item, String(Self._options.Prop.ValueForKey(item)))
 			Next
 		EndIf
 
-		' - Execute
+		' Execute the build script..
 		Try
 			builder.run()
 		Catch e:Object
@@ -136,7 +134,7 @@ Type App
 			Self._exitCode = 1
 		End Try
 
-		' -- Write the build log (if required)
+		' TODO: Write the build log (if required)
 
 	End Method
 

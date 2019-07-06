@@ -410,7 +410,15 @@ Type ProjectBuilder
 	' ------------------------------------------------------------
 	' -- Creation & Destruction
 	' ------------------------------------------------------------
-	
+
+	Function Create:ProjectBuilder(script:BuildScript)
+		Local this:BuildScript
+
+		this.setScript(script)
+
+		Return this
+	End Function
+
 	Method New()
 		Self._buildQueue	 		= New TList
 		Self._targetExecutionStack	= New TList
