@@ -43,7 +43,16 @@ Type EnvironmentFunctions Extends FunctionSet
 		?
 		
 	End Method
+
+	Method getAppExtension:String() 			{ name="environment::get-app-extension" }
 	
+		?Win32		Return ".exe"
+		?Linux		Return ""
+		?osx		Return ".app"
+		?
+
+	End Method
+
 	Method GetUserName:String()					{ name="environment::get-user-name" }
 		Return getenv_("USERNAME")
 	End Method
