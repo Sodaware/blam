@@ -412,7 +412,7 @@ Type ProjectBuilder
 	' ------------------------------------------------------------
 
 	Function Create:ProjectBuilder(script:BuildScript)
-		Local this:ProjectBuilder
+		Local this:ProjectBuilder = New ProjectBuilder
 
 		this.setScript(script)
 
