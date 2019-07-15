@@ -26,6 +26,7 @@ Type BuildCommand
 	Field _startCol:Int
 	Field _endCol:Int
 
+	' TODO: Convert this to a StringTable
 	Field _parameters:TMap
 	Field _childElements:TList
 
@@ -45,7 +46,7 @@ Type BuildCommand
 	Method getChildren:TList()
 		Return Self._childElements
 	End Method
-	
+
 	Method hasAttribute:Byte(name:String)
 		Return ( Self._parameters.valueForKey(name) <> Null )
 	End Method
@@ -77,7 +78,7 @@ Type BuildCommand
 			Print "~t~t" + Self._name + " [" + Self._value + "]"
 		Else
 			Print "~t~t" + Self._name
-		EndIf	
+		EndIf
 
 		For Local param:String = EachIn Self._parameters.Keys()
 			Print "~t~t~t" + LSet(param, 20) + " => " + String(Self._parameters.ValueForKey(param))

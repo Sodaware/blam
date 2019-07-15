@@ -76,7 +76,7 @@ Type BuildScript
 	Method getFilePath:String()
 		Return Self._filePath
 	End Method
-	
+
 	''' <summary>Get a list of all global tasks in the build script.</summary>
 	Method getGlobalTasks:TList()
 		Return Self._globalTasks
@@ -86,7 +86,7 @@ Type BuildScript
 	Method getGlobalProperties:TMap()
 		Return Self._globalProperties
 	End Method
-		
+
 	''' <summary>Get the default build target for this script.</summary>
 	Method getDefaultTargetName:String()
 		Return Self._defaultTarget
@@ -97,7 +97,7 @@ Type BuildScript
 	Method getTarget:BuildTarget(targetName:String)
 		Return BuildTarget(Self._buildTargets.ValueForKey(targetName))
 	End Method
-	
+
 	''' <summary>Get the currently executing build target.</summary>
 	Method getCurrentTarget:BuildTarget()
 		Return Self._currentTarget
