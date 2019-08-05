@@ -15,8 +15,8 @@ SuperStrict
 
 ''' <summary>Type containing information about this assembly (application)</summary>
 Type AssemblyInfo
-	Const Name:String        = "blam"
-	Const Version:String     = "0.4.0"
-	Const Company:String     = "Sodaware"
-	Const Date:String        = "07 Apr 2018"
+	Const Name:String    = "blam"
+	Const Version:String = "0.1.0"
+	Const Company:String = "Phil Newton"
+	Const Date:String    = "07 Apr 2018"
 End Type

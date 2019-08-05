@@ -12,7 +12,6 @@
 
 SuperStrict
 
-Import sodaware.Console_Color
 Import "../build_task.bmx"
 Import "../../types/fileset.bmx"
 Import "../../types/filter_chain.bmx"

@@ -5,7 +5,7 @@
 ' -- Blitz family of languages.
 ' --
 ' -- This file is part of "blam" (https://www.sodaware.net/blam/)
-' -- Copyright (c) 2007-2017 Phil Newton
+' -- Copyright (c) 2007-2019 Phil Newton
 ' --
 ' -- Blam is free software; you can redistribute it and/or modify
 ' -- it under the terms of the GNU General Public License as published by 
