@@ -22,7 +22,6 @@ Import "console_options.bmx"
 
 ' -- Services
 Import "../service_manager.bmx"
-' Import "../services/plugin_manager/plugin_manager_service.bmx"
 Import "../services/configuration_service.bmx"
 Import "../services/task_manager/task_manager_service.bmx"
 
@@ -67,9 +66,8 @@ Type App
 		' TODO: Check for a lack of build arguments here - show help if required
 
 		' -- Add standard services to ServiceManager
-		Self._services.AddService(New ConfigurationService)
-		' Self._services.AddService(New PluginManager)
-		Self._services.AddService(New TaskManagerService)
+		Self._services.addService(New ConfigurationService)
+		Self._services.addService(New TaskManagerService)
 
 		' -- Initialise the services
 		Self._services.initaliseServices()
