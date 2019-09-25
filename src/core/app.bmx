@@ -31,7 +31,7 @@ Import "../file/build_script_loader.bmx"
 Import "../file/build_script.bmx"
 
 
-''' <summary>Main BlitzBuild application.</summary>
+''' <summary>Main blam application.</summary>
 Type App
 
 	Field _options:ConsoleOptions			'''< Command line options
@@ -143,12 +143,10 @@ Type App
 
 	''' <summary>Writes the application header.</summary>
 	Method writeHeader()
-
-		PrintC "%gBlitzBuild " + AssemblyInfo.Version + " (Released: " + AssemblyInfo.Date + ")"
-		PrintC "(C)opyright 2006-2018 " + AssemblyInfo.Company
+		PrintC "%gblam " + AssemblyInfo.Version + " (Released: " + AssemblyInfo.Date + ")"
+		PrintC "(C)opyright 2006-2019 " + AssemblyInfo.Company
 		PrintC "%chttps://www.sodaware.net/blam/%n"
 		PrintC ""
-
 	End Method
 
 	Method listTargets(file:BuildScript)
