@@ -18,17 +18,14 @@ Import "function_set.bmx"
 
 Type DateFunctions Extends FunctionSet
 
-	' ------------------------------------------------------------
-	' -- Date Functions
-	' ------------------------------------------------------------
-
-	''' <summary>
-	''' Get the current date in the form: day month abbreviation and year
-	''' </summary>
+	''' <summary>Get the current date as a string.</summary>
+	''' <return>The current date in the form: "day month_abbreviation year".</return>
 	Method getCurrentDate:String() { name="date::get-current-date" }
 		Return CurrentDate()
 	End Method
 
+	''' <summary>Get the current time as a string.</summary>
+	''' <return>The current time in the form "hours:minutes:seconds".</return>
 	Method getCurrentTime:String() { name="date::get-current-time" }
 		Return CurrentTime()
 	End Method
