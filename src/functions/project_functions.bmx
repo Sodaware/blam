@@ -21,13 +21,13 @@ Type ProjectFunctions Extends FunctionSet
 	' ------------------------------------------------------------
 
 	''' <summary>Gets the name of the current project.</summary>
-	''' <returns>Project name</returns>
+	''' <returns>The current project name.</returns>
 	Method getName:String()													{ name="project::get-name"}
 		Return Self.getProject().getName()
 	End Method
 
 	''' <summary>Get the path of the current build file.</summary>
-	''' <returns>Path of current build file.</returns>
+	''' <returns>Full path of current build file, minus the file name.</returns>
 	Method getBuildfilePath:String()										{ name="project::get-buildfile-path" }
 		Return ExtractDir(Self.getProject().getFilePath())
 	End Method
