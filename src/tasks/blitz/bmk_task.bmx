@@ -23,25 +23,27 @@ Import "../../services/configuration_service.bmx"
 Import "../../util/process_runner.bmx"
 Import "../../util/compiler_error.bmx"
 
+''' <summary>Compiles BlitzMax applications and modules.</summary>
 Type BmkTask Extends BuildTask
 
 	Const SPINNER_CHARS:String	= "|/-\"
 
 	Field _config:ConfigurationService
 
-	Field source:String						'''< The input file or module to compile
-	Field output:String						'''< [optional] The output file to create.
-	Field action:String			= "makeapp"	'''< [optional] The build action to take.
-	Field threaded:Int			= False		'''< [optional] Enable threading
-	Field gui:Int				= False		'''< [optional] Enable GUI mode (hides the console if true)
-	Field overwrite:Int			= False		'''< [optional] If true, will delete the "todir" if it already exists
-	Field rebuild:Int			= False		'''< [optional] If true, fall source will be rebuilt
-	Field debug:Int				= true		'''< [optional] If true, debug mode will be enabled
-	Field fancy:Int				= false		'''< [optional] If true, will use fancy output
-	Field failonerror:Int       = False     '''< [optional] If true, will fail the build if compilation fails
+	Field source:String                     '''< The input file or module to compile
+	Field output:String                     '''< [optional] The output file to create. Required if action is "buildapp".
+	Field action:String         = "makeapp" '''< [optional] The build action to take. Allowed values are "makeapp" and "makemods".
+	Field threaded:Byte         = False     '''< [optional] If true, the source will be compiled with threading enabled.
+	Field gui:Byte              = False     '''< [optional] If true, the source will be compiled with console output disabled.
+	Field rebuild:Byte          = False     '''< [optional] If true, the bmx cache will be ignored and all source files will be compiled.
+	Field debug:Byte            = True      '''< [optional] If true, debug mode will be enabled.
+	Field fancy:Byte            = False     '''< [optional] If true, will use fancy output.
+	Field failonerror:Byte      = True      '''< [optional] If true, the build will fail if compilation fails.
 
-	Field _isCompiling:Int		= False
-	Field _isLinking:Int		= False
+	' Internal flags
+	Field _isCompiling:Byte     = False
+	Field _isLinking:Byte       = False
+
 
 	' ------------------------------------------------------------
 	' -- Task Execution
@@ -258,7 +260,7 @@ Type BmkTask Extends BuildTask
 		Return Self.action <> "makeapp"
 	End Method
 
-	Method _addCommandOption:String(test:Int, option:String)
+	Method _addCommandOption:String(test:Byte, option:String)
 		If test Then Return " " + option
 	End Method
 

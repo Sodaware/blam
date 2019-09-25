@@ -21,7 +21,7 @@ Type ZipTask Extends BuildTask
 
 	Field destfile:String                       '''< Zip file to write to.
 	Field files:Fileset                         '''< Fileset of files to include.
-	Field verbose:Int           = False         '''< [optional] Show verbose output.
+	Field verbose:Byte          = False         '''< [optional] Show verbose output.
 	field level:Int             = 5             '''< [optional] Compression level between 0-9.
 
 	Method execute()
