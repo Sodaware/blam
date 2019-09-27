@@ -67,10 +67,11 @@ Type BmkTask Extends BuildTask
 		' Create compilation command and add the full path to BMK.
 		Local command:String = ProcessRunner.GetSafeName(Self._getCompilerPath())
 
-		' Add action (makemods or makeapp).
+		' Add action (makemods, makeapp or makelib).
 		Select Self.action
-			Case "makeapp"	; command :+ " makeapp"
-			Case "makemods"	; command :+ " makemods"
+			Case "makeapp"  ; command :+ " makeapp"
+			Case "makemods" ; command :+ " makemods"
+			Case "makelib"  ; command :+ " makelib"
 
 			' TODO: Use a proper exception here.
 			Default			; Throw "Unknown command: '" + Self.action + "'"
@@ -102,7 +103,11 @@ Type BmkTask Extends BuildTask
 		Local compileProcess:ProcessRunner = ProcessRunner.Create(command)
 		If compileProcess = Null Then Throw "Could not open BMK"
 
-		Self.Log("Building %w~q" + Self.source + "~q%n")
+		Select Self.action
+			Case "makeapp"  ; Self.log("Building %w~q" + Self.source + "~q%n")
+			Case "makemods" ; Self.log("Building module %w~q" + Self.source + "~q%n")
+			Case "makelib"  ; Self.log("Building library %w~q" + Self.source + "~q%n")
+		End select
 
 		Local success:Byte = True
 
