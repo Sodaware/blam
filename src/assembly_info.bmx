@@ -18,5 +18,5 @@ Type AssemblyInfo
 	Const Name:String    = "blam"
 	Const Version:String = "0.1.0"
 	Const Company:String = "Phil Newton"
-	Const Date:String    = "07 Apr 2018"
+	Const Date:String    = "01 Oct 2019"
 End Type
