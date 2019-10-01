@@ -214,6 +214,12 @@ Type App
 		' Get path from options. May be blank.
 		Local buildFile:String = Self._options.File
 
+		' Ensure buildFile path is relative to the launchdir if it is not
+		' absolute.
+		If buildFile <> "" And RealPath(buildFile) <> buildFile Then
+			buildFile = File_Util.PathCombine(LaunchDir, buildFile)
+		EndIf
+
 		' If no build file was passed in, search for "build.xml" and "blam.xml"
 		' in the current directory.
 		If buildFile = "" Then
