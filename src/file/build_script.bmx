@@ -18,7 +18,6 @@ Import brl.linkedlist
 
 Import "build_target.bmx"
 Import "build_node.bmx"
-Import "../types/base_type.bmx"
 
 ''' <summary>BlitzBuild build script.</summary>
 Type BuildScript

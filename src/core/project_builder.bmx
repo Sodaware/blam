@@ -4,7 +4,7 @@
 ' -- Handles the execution of the build script.
 ' --
 ' -- This file is part of "blam" (https://www.sodaware.net/blam/)
-' -- Copyright (c) 2007-2017 Phil Newton
+' -- Copyright (c) 2007-2019 Phil Newton
 ' --
 ' -- See COPYING for full license information.
 ' ------------------------------------------------------------------------------
@@ -293,6 +293,9 @@ Type ProjectBuilder
 		
 		' Create type
 		Local child:BaseType = BaseType(childType.NewObject())
+
+		' Set common details.
+		child.setProject(Self._buildScript)
 		
 		' Set attributes
 		For Local attName:String = EachIn node.Attributes.Keys()

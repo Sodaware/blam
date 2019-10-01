@@ -13,7 +13,15 @@
 SuperStrict
 
 Import "../file/build_node.bmx"
+Import "../file/build_script.bmx"
 
 Type BaseType
 	Field _builder:Object
+	Field _project:BuildScript
+
+	Method setProject:BaseType(project:BuildScript)
+		Self._project = project
+
+		Return Self
+	End Method
 End Type
