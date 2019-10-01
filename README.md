@@ -1,7 +1,22 @@
 # blam
 
+![GPLv3](https://img.shields.io/github/license/Sodaware/blam.svg)
+![GitHub release](https://img.shields.io/github/release/Sodaware/blam.svg)
+
 `blam` is a very simple build system for Blitz. It's based on BlitzBuild, but
 has been rebuilt in BlitzMax and made cross-platform.
+
+
+## Quick Links
+
+Project Homepage:
+: https://www.sodaware.net/blam/
+
+Source Code
+: https://github.com/sodaware/blam/
+
+Full Documentation
+: https://docs.sodaware.net/blam/latest/
 
 
 ## Overview
