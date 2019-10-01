@@ -20,53 +20,58 @@ Type DeleteTask Extends BuildTask
 	Field file:String
 	Field dir:String
 	Field filesets:TList = New TList
-	
+	Field verbose:Byte   = False
+
+
 	' ------------------------------------------------------------
 	' -- Task Execution
 	' ------------------------------------------------------------
-	
+
 	Method execute()
-		
+
 		' Delete file name (if set)
 		If Self.file Then
 			If FileType(Self.file) = FILETYPE_FILE Then
+				If Self.verbose Then Self.log(Self.file)
 				DeleteFile(Self.file)
 			EndIf
 		EndIf
-		
+
 		' Delete a directory (if set)
 		If Self.dir Then
 			If FileType(Self.dir) = FILETYPE_DIR Then
+				If Self.verbose Then Self.log(Self.dir)
 				DeleteDir(Self.dir)
 			End If
 		EndIf
-		
+
 		' Delete a fileset
 		If Self.filesets <> Null Then
-			
+
 			Local fileCount:Int = 0
 			Local totalSize:Int = 0
-		
+
 			For Local fs:Fileset = EachIn Self.filesets
-				
+
 				Local list:TList = fs.getIncludedFiles()
-				
+
 				For Local fileName:String = EachIn list
 					fileCount:+ 1
 					totalSize:+ FileSize(fileName)
+					If Self.verbose Then Self.log(fileName)
 					DeleteFile(fileName)
 				Next
-				
+
 			Next
-			
+
 			Self.Log("Deleted " + fileCount + " files (" + totalSize + " bytes)")
-			
+
 		EndIf
-		
+
 	End Method
-	
+
 	Method setFileset(fs:Fileset)
 		Self.filesets.AddLast(fs)
 	End Method
-	
+
 End Type
