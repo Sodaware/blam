@@ -24,6 +24,7 @@ Type BuildTask
 	Const LEVEL_WARN:Byte   = 2
 	Const LEVEL_ERROR:Byte  = 3
 
+	Field _nodeContent:String
 	Field _services:ServiceManager
 	Field _project:BuildScript
 

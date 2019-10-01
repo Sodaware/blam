@@ -272,6 +272,9 @@ Type ProjectBuilder
 			Next
 			
 		EndIf
+
+		' Set the contents.
+		taskHandler._nodeContent = cmd._value
 		
 		' -- Run this task
 		ConsoleUtil.currentTask = cmd.getName()
