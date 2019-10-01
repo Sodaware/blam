@@ -40,7 +40,7 @@ Type EchoTask Extends BuildTask
 
 	''' <summary>Output to the console.</summary>
 	Method _echoToConsole()
-		ConsoleUtil.PrintC(message)
+		ConsoleUtil.PrintC(Self._getMessage())
 	End Method
 
 
@@ -68,11 +68,17 @@ Type EchoTask Extends BuildTask
 		EndIf
 
 		' Write
-		fileOut.WriteLine(Self.message)
+		fileOut.WriteLine(Self._getMessage())
 
 		' Cleanup
 		fileOut.Close()
 
+	End Method
+
+	Method _getMessage:String()
+		If Self.message <> "" Then Return Self.message
+
+		Return Self._nodeContent
 	End Method
 
 End Type
