@@ -83,15 +83,23 @@ Type ConfigurationService Extends Service
 	''' <summary>
 	''' Get the full path to the default configuration file.
 	'''
-	''' Tests for `blam.ini`, then `blitzbuild.ini` in the application directory.
+	''' Tests for the following file names:
+	'''   * ~/.blamrc
+	'''   * blam.ini` in the execution directory.
+	'''   * `blitzbuild.ini` in the execution directory.
 	''' </summary>
 	Method _getDefaultConfigPath:String()
-		' Test for configuration files in the application directory.
-		If FILETYPE_FILE = FileType(File_Util.PathCombine(AppDir, "blam.ini")) Then
-			Return File_Util.PathCombine(AppDir, "blam.ini")
-		ElseIf FILETYPE_FILE = FileType(File_Util.PathCombine(AppDir, "blitzbuild.ini")) Then
-			Return File_Util.PathCombine(AppDir, "blitzbuild.ini")
-		EndIf
+		' List of allowed paths, highest-priority first.
+		Local allowedPaths:String[] = [ ..
+			File_Util.PathCombine(File_Util.GetHomeDir(), ".blamrc"), ..
+			File_Util.PathCombine(AppDir, "blam.ini"), ..
+			File_Util.PathCombine(AppDir, "blitzbuild.ini") ..
+		]
+
+		' Test each paths and return the first path that exists.
+		For Local path:String = EachIn allowedPaths
+			If FILETYPE_FILE = FileType(path) Then Return path
+		Next
 
 		Return ""
 	End Method
