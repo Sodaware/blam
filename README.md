@@ -53,8 +53,15 @@ when executing the default target).
 ## Configuration
 
 Before `blam` can properly run, it needs to be configured with paths to
-BlitzMax. `blam` will autoload the contents of `blam.ini` or `blitzbuild.ini` in
-the `blam` executable's directory.
+BlitzMax. `blam` will look for a configuration file in the following places:
+
+  - "~/.blamrc"
+  - "~/.config/blam.ini"
+  - "~/.config/bliztzbuild.ini"
+  - "blam.ini" in the `blam` executable' directory
+  - "blitzbuild.ini" in the `blam` executable' directory
+
+The configuration path can also be set via the `--config` command line option.
 
 The ini should contain the following information:
 
