@@ -85,6 +85,8 @@ Type ConfigurationService Extends Service
 	'''
 	''' Tests for the following file names:
 	'''   * ~/.blamrc
+	'''   * blam.ini` in the ~/.config directory.
+	'''   * `blitzbuild.ini` in the ~/.config directory.
 	'''   * blam.ini` in the execution directory.
 	'''   * `blitzbuild.ini` in the execution directory.
 	''' </summary>
@@ -92,6 +94,8 @@ Type ConfigurationService Extends Service
 		' List of allowed paths, highest-priority first.
 		Local allowedPaths:String[] = [ ..
 			File_Util.PathCombine(File_Util.GetHomeDir(), ".blamrc"), ..
+			File_Util.PathCombine(File_Util.GetHomeDir(), ".config/blam.ini"), ..
+			File_Util.PathCombine(File_Util.GetHomeDir(), ".config/blitzbuild.ini"), ..
 			File_Util.PathCombine(AppDir, "blam.ini"), ..
 			File_Util.PathCombine(AppDir, "blitzbuild.ini") ..
 		]
