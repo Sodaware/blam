@@ -4,7 +4,7 @@
 ' -- Service that maintains the application's configuration.
 ' --
 ' -- This file is part of "blam" (https://www.sodaware.net/blam/)
-' -- Copyright (c) 2007-2017 Phil Newton
+' -- Copyright (c) 2007-2020 Phil Newton
 ' --
 ' -- See COPYING for full license information.
 ' ------------------------------------------------------------------------------
@@ -12,7 +12,6 @@
 
 SuperStrict
 
-Import brl.retro
 Import sodaware.File_Util
 Import sodaware.file_config
 Import sodaware.file_config_iniserializer
@@ -59,7 +58,6 @@ Type ConfigurationService Extends Service
 
 	Method unloadService()
 		Self._config = Null
-		GCCollect()
 	End Method
 
 
@@ -100,7 +98,7 @@ Type ConfigurationService Extends Service
 			File_Util.PathCombine(AppDir, "blitzbuild.ini") ..
 		]
 
-		' Test each paths and return the first path that exists.
+		' Test each path and return the first one that exists.
 		For Local path:String = EachIn allowedPaths
 			If FILETYPE_FILE = FileType(path) Then Return path
 		Next
