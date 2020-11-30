@@ -21,6 +21,7 @@ Type ConsoleOptions Extends CommandLineOptions
 	Field NoLogo:Byte   = False             { Description="Hide the copyright notice" LongName="nologo" ShortName="n" }
 	Field File:String   = ""                { Description="The build file to use" LongName="file-name" ShortName="f"  }
 	Field Target:String = ""                { Description="The build target to use" LongName="target" ShortName="t" }
+	Field Config:String = ""                { Description="Optional path of configuration file" LongName="config" ShortName="c" }
 
 	Field Silent:Byte   = False             { Description="Supress output to the console" LongName="silent" ShortName="s" }
 	Field Prop:TMap     = New TMap          { Description="Properties to send to the project" NoHelp }

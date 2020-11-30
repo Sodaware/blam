@@ -46,7 +46,7 @@ Type App
 	''' <summary>Application entry point.</summary>
 	Method run:Int()
 
-		' -- Setup the app
+		' -- Setup the app.
 		Self._setup()
 
 		' -- Setup output options.
@@ -60,10 +60,10 @@ Type App
 			Return Self._shutdown()
 		End If
 
-		' -- Show application header (if not hidden)
+		' -- Show application header (if not hidden).
 		If Not(Self._options.NoLogo) Then Self.writeHeader()
 
-		' -- Show help message if requested - quit afterwards
+		' -- Show help message if requested - quit afterwards.
 		If True = Self._options.Help Then
 			Self._options.showHelp()
 			Return Self._shutdown()
@@ -71,17 +71,17 @@ Type App
 
 		' TODO: Check for a lack of build arguments here - show help if required
 
-		' -- Add standard services to ServiceManager
-		Self._services.addService(New ConfigurationService)
+		' -- Add standard services to ServiceManager.
+		Self._services.addService(ConfigurationService.Create(Self._options.Config))
 		Self._services.addService(New TaskManagerService)
 
-		' -- Initialise the services
+		' -- Initialise the services.
 		Self._services.initaliseServices()
 
-		' -- Run the build script
+		' -- Run the build script.
 		Self._execute()
 
-		' -- Cleanup and return
+		' -- Cleanup and return.
 		Self._shutdown()
 
 		Return Self._exitCode

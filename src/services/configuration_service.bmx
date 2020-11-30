@@ -22,6 +22,7 @@ Import "service.bmx"
 Type ConfigurationService Extends Service
 
 	Field _config:Config            '''< Internal configuration object
+	Field _path:String              '''< Path to configuration file.
 
 
 	' ------------------------------------------------------------
@@ -44,18 +45,64 @@ Type ConfigurationService Extends Service
 	' ------------------------------------------------------------
 
 	Method initialiseService()
+		' Set default path if not passed in.
+		If Self._path = "" Then Self._path = Self._getDefaultConfigPath()
 
-		' Load configuration file
-		Self._config = New Config
-		IniConfigSerializer.Load(Self._config, File_Util.pathcombine(AppDir, "blitzbuild.ini"))
+		' Normalize the path.
+		If RealPath(Self._path) <> Self._path Then Self._normalizePath()
+
+		' Load configuration file.
+		Self._loadConfig()
 
 		' TODO: Check that important values are set
-
 	End Method
-	
+
 	Method unloadService()
 		Self._config = Null
 		GCCollect()
+	End Method
+
+
+	' ------------------------------------------------------------
+	' -- Creation
+	' ------------------------------------------------------------
+
+	Function Create:ConfigurationService(path:String)
+		Local this:ConfigurationService = New ConfigurationService
+
+		this._path = path
+
+		Return this
+	End Function
+
+
+	' ------------------------------------------------------------
+	' -- Internal helpers
+	' ------------------------------------------------------------
+
+	''' <summary>
+	''' Get the full path to the default configuration file.
+	'''
+	''' Tests for `blam.ini`, then `blitzbuild.ini` in the application directory.
+	''' </summary>
+	Method _getDefaultConfigPath:String()
+		' Test for configuration files in the application directory.
+		If FILETYPE_FILE = FileType(File_Util.PathCombine(AppDir, "blam.ini")) Then
+			Return File_Util.PathCombine(AppDir, "blam.ini")
+		ElseIf FILETYPE_FILE = FileType(File_Util.PathCombine(AppDir, "blitzbuild.ini")) Then
+			Return File_Util.PathCombine(AppDir, "blitzbuild.ini")
+		EndIf
+
+		Return ""
+	End Method
+
+	Method _normalizePath()
+		Self._path = File_Util.PathCombine(LaunchDir, Self._path)
+	End Method
+
+	Method _loadConfig()
+		Self._config = New Config
+		IniConfigSerializer.Load(Self._config, Self._path)
 	End Method
 
 End Type
