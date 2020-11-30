@@ -54,6 +54,12 @@ Type App
 			Console_Color_DisableFormatting()
 		End If
 
+		' -- Show version and quit if requested.
+		If Self._options.Version Then
+			Print(AssemblyInfo.Name + " " + AssemblyInfo.Version)
+			Return Self._shutdown()
+		End If
+
 		' -- Show application header (if not hidden)
 		If Not(Self._options.NoLogo) Then Self.writeHeader()
 

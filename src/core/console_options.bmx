@@ -26,6 +26,7 @@ Type ConsoleOptions Extends CommandLineOptions
 	Field Prop:TMap     = New TMap          { Description="Properties to send to the project" NoHelp }
 	Field Verbose:Byte  = False             { Description="Enable verbose output" LongName="verbose" ShortName="v" }
 	Field Bland:Byte    = False             { Description="Disable colourized output" LongName="bland" ShortName="b" }
+	Field Version:Byte  = False             { Description="Show the current version" LongName="version" }
 
 	Field List:Byte     = False             { Description="List all available targets in buildfile" LongName="list" ShortName="l"}
 
