@@ -33,8 +33,7 @@ Type ConsoleOptions Extends CommandLineOptions
 
 	Field Help:Byte     = False
 
-	Method ShowHelp()
-
+	Method showHelp()
 		PrintC "%_Usage%n: blam [options] [--file file] [--target target]"
 		PrintC ""
 		PrintC "Build a blam project."
@@ -42,8 +41,8 @@ Type ConsoleOptions Extends CommandLineOptions
 
 		' Args: Column Width, Use Colours
 		PrintC "%YCommands:%n "
+		PrintC(Self.wrapHelpText("--prop:<NAME>", "  Set property <NAME> to a value"))
 		PrintC(Super.createHelp(80, True))
-
 	End Method
 
 	' sorry :(
