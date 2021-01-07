@@ -63,7 +63,11 @@ BlitzMax. `blam` will look for a configuration file in the following places:
 
 The configuration path can also be set via the `--config` command line option.
 
-The ini should contain the following information:
+If no configuration file is present, you will be prompted to use the set wizard
+which will prompt for a `bmk` path.
+
+To manually configure `blam`, create an ini file at any of the locations
+above. The ini should contain the following information:
 
 ```ini
 # Configuration file for blam
