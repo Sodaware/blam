@@ -19,12 +19,13 @@ Import "../../types/filter_chain.bmx"
 Type CopyTask Extends BuildTask
 
 	Field file:String                       '''< The file to copy. Can be replaced with fileset.
-	Field tofile:String                     '''< The destination filename to copy to. Ignored with fileset.
-	Field todir:String                      '''< The directory to copy the file/files to.
-	Field overwrite:Byte    = False         '''< If true will overwrite any files
+	Field toFile:String                     '''< The destination filename to copy to. Ignored with fileset.
+	Field toDir:String                      '''< The directory to copy the file/files to.
+	Field overwrite:Byte                    '''< If true will overwrite any files.
+	Field createDirs:Byte                   '''< If true, will create directory structure when copying files.
 	Field files:Fileset                     '''< [optional] List of files to copy.
 	Field filters:FilterChain               '''< [optional] List of filters to run files through.
-	Field verbose:Byte      = False         '''< [optional] Show verbose output
+	Field verbose:Byte                      '''< [optional] Show verbose output.
 
 
 	' ------------------------------------------------------------
@@ -32,7 +33,6 @@ Type CopyTask Extends BuildTask
 	' ------------------------------------------------------------
 
 	Method execute()
-
 		Self.printHeader()
 
 		' Quit out if missing a valid file location.
@@ -47,8 +47,7 @@ Type CopyTask Extends BuildTask
 			totalFiles = filesToCopy.count()
 
 			For Local file:String = EachIn filesToCopy
-
-				Local destination:String = (file.Replace(files.dir, Self.todir))
+				Local destination:String = file.Replace(files.dir, Self.todir)
 
 				' Do nothing if the file already exists and overwriting is disabled.
 				If Self.overwrite = False And FileType(destination) = FILETYPE_FILE Then Continue
@@ -57,7 +56,16 @@ Type CopyTask Extends BuildTask
 					Self.Log(file + " => " + destination)
 				EndIf
 
-				CopyFile(file, destination)
+				' Create the directory if not present.
+				If FileType(ExtractDir(destination)) <> FILETYPE_DIR And Self.createDirs Then
+					CreateDir(ExtractDir(destination), True)
+				EndIf
+
+				' Copy file and display an error if it failed.
+				If Not CopyFile(file, destination) Then
+					Self.Log("Could not copy to " + destination, LEVEL_ERROR)
+					Continue
+				EndIf
 
 				' Process the file if needed.
 				If Self.filters Then
@@ -68,19 +76,31 @@ Type CopyTask Extends BuildTask
 			Next
 
 		Else
-
 			' Copy a single file.
-
-			' TODO: Check the "from" file exists.
-
-			' Do nothing if the file already exists and overwriting is disabled.
-''			If Self.overwrite = False And FileType(Self.tofile) = FILETYPE_FILE
+			totalFiles = 1
 
 			If Self.verbose Then
 				Self.Log(Self.file + " => " + Self.tofile)
-			End If
+			EndIf
 
-			CopyFile(Self.file, Self.tofile)
+			' Do nothing if the file already exists and overwriting is disabled.
+			If Self.overwrite = False And FileType(Self.tofile) = FILETYPE_FILE Then
+				If Self.verbose Then Self.Log("  Skipping (file exists)")
+
+				Return
+			EndIf
+
+			' Create the destination directory if not present.
+			If FileType(ExtractDir(Self.toFile)) <> FILETYPE_DIR And Self.createDirs Then
+				CreateDir(ExtractDir(Self.toFile), True)
+			EndIf
+
+			' Copy the file
+			If Not CopyFile(Self.file, Self.toFile) Then
+				Self.Log("Could not copy to " + Self.toFile, LEVEL_ERROR)
+
+				Return
+			EndIf
 
 			' Process the file if needed.
 			If Self.filters Then
@@ -88,7 +108,6 @@ Type CopyTask Extends BuildTask
 			End If
 
 			copiedFiles = 1
-			totalFiles  = 1
 
 		End If
 
