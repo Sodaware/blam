@@ -175,10 +175,10 @@ Type App
 
 		If bmkPath Then
 			PrintC "Please enter the path to the %Wbmk%n executable, or leave blank to set as:"
-			PrintC "%w" + bmkPpath + "%n"
+			PrintC "%w" + bmkPath + "%n"
 			newPath = Input("> ")
 
-			If newPath = "" Then newPath = path
+			If newPath = "" Then newPath = bmkPath
 		Else
 			PrintC "Please enter the path to the %Wbmk%n executable:"
 			newPath = Input("> ")
