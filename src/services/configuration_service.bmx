@@ -28,6 +28,10 @@ Type ConfigurationService Extends Service
 	' -- Configuration API
 	' ------------------------------------------------------------
 
+	Method isAppConfigured:Byte()
+		Return Self._getDefaultConfigPath() <> ""
+	End Method
+
 	''' <summary>Get a value from the configuration file.</summary>
 	''' <param name="sectionName">The section the key belongs to.</param>
 	''' <param name="keyName">The key name to retrieve.</param>
@@ -113,6 +117,15 @@ Type ConfigurationService Extends Service
 	Method _loadConfig()
 		Self._config = New Config
 		IniConfigSerializer.Load(Self._config, Self._path)
+	End Method
+
+	Method saveConfiguration:String()
+		Local saveTo:String = Self._getDefaultConfigPath()
+		If saveTo = "" Then saveTo = File_Util.PathCombine(File_Util.GetHomeDir(), ".blamrc")
+
+		IniConfigSerializer.Save(Self._config, saveTo)
+
+		Return saveTo
 	End Method
 
 End Type

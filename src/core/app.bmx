@@ -33,15 +33,18 @@ Import "../file/build_script.bmx"
 
 ''' <summary>Main blam application.</summary>
 Type App
+	Field _options:ConsoleOptions               '''< Command line options
+	Field _services:ServiceManager              '''< Application services
+	Field _exitCode:Int                         '''< Code to return to application
 
-	Field _options:ConsoleOptions			'''< Command line options
-	Field _services:ServiceManager			'''< Application services
-	Field _exitCode:Int						'''< Code to return to application
+	Field _configService:ConfigurationService   '''< Holds global configuration info.
+	Field _taskService:TaskManagerService       '''< Holds information about available tasks.
 
 
 	' ------------------------------------------------------------
 	' -- Main application entry
 	' ------------------------------------------------------------
+
 
 	''' <summary>Application entry point.</summary>
 	Method run:Int()
@@ -57,6 +60,7 @@ Type App
 		' -- Show version and quit if requested.
 		If Self._options.Version Then
 			Print(AssemblyInfo.Name + " " + AssemblyInfo.Version)
+
 			Return Self._shutdown()
 		End If
 
@@ -66,17 +70,32 @@ Type App
 		' -- Show help message if requested - quit afterwards.
 		If True = Self._options.Help Then
 			Self._options.showHelp()
+
 			Return Self._shutdown()
 		End If
 
 		' TODO: Check for a lack of build arguments here - show help if required
 
 		' -- Add standard services to ServiceManager.
-		Self._services.addService(ConfigurationService.Create(Self._options.Config))
-		Self._services.addService(New TaskManagerService)
+		Self._configService = ConfigurationService.Create(Self._options.Config)
+		Self._taskService   = New TaskManagerService
+
+		Self._services.addService(Self._configService)
+		Self._services.addService(Self._taskService)
 
 		' -- Initialise the services.
 		Self._services.initaliseServices()
+
+		' -- Run setup wizard if no configuration.
+		If Not Self._configService.isAppConfigured() Then
+			Local result:Byte = Self._runConfigurationWizard()
+			If Not result Then
+				Self._shutdown()
+				Self._exitCode = -1
+
+				Return Self._exitCode
+			EndIf
+		EndIf
 
 		' -- Run the build script.
 		Self._execute()
@@ -142,6 +161,47 @@ Type App
 
 	End Method
 
+	Method _runConfigurationWizard:Byte()
+		Local r:String = Input("No configuration detected. Run setup wizard (y/n)? ")
+		If r.toLower() <> "y" And r.toLower() <> "yes" Then Return False
+
+		Local platform:String     = Self.getPlatform()
+		Local platformName:String = Self.getPlatformName()
+		Local bmkPath:String      = Self.guessBmkPath()
+		Local newPath:String      = ""
+
+		PrintC "No configuration file detected. Entering configuration setup."
+		PrintC "Current platform: %Y" + platformName + "%n~n"
+
+		If bmkPath Then
+			PrintC "Please enter the path to the %Wbmk%n executable, or leave blank to set as:"
+			PrintC "%w" + bmkPpath + "%n"
+			newPath = Input("> ")
+
+			If newPath = "" Then newPath = path
+		Else
+			PrintC "Please enter the path to the %Wbmk%n executable:"
+			newPath = Input("> ")
+		EndIf
+
+		Print
+
+		If newPath = "" Then
+			PrintC "~n%rNo path entered.%n Cannot continue. Please see README.d for manual setup instructions."
+
+			Return -1
+		Else
+			Self._configService._config.setKey("BlitzMax", platform, newPath)
+
+			Local savedTo:String = Self._configService.saveConfiguration()
+
+			PrintC "%gPath set succesfully.%n"
+			PrintC "Configuration saved to: " + savedTo
+		EndIf
+
+		Return True
+	End Method
+
 
 	' ------------------------------------------------------------
 	' -- Output methods
@@ -184,13 +244,11 @@ Type App
 	' ------------------------------------------------------------
 
 	Method _setup()
-
-		' Get command line options
+		' Get command line options.
 		Self._options = New ConsoleOptions
 
-		' Setup service manager
+		' Setup service manager.
 		Self._services = New ServiceManager
-
 	End Method
 
 	Method _shutdown:Int()
@@ -238,6 +296,44 @@ Type App
 		End If
 
 		Return buildFile
+	End Method
+
+
+	' ------------------------------------------------------------
+	' -- Config Helpers
+	' ------------------------------------------------------------
+
+	Method getPlatform:String()
+		?win32
+		Return "win32"
+		?linux
+		Return "linux"
+		?macos
+		Return "macos"
+		?
+	End Method
+
+	Method getPlatformName:String()
+		?win32
+		Return "Windows"
+		?linux
+		Return "GNU/Linux"
+		?macos
+		Return "MacOS"
+		?
+	End Method
+
+	Method guessBmkPath:String()
+		?win32
+		Return ""
+		?
+
+		Local runner:ProcessRunner = ProcessRunner.Create("which bmk")
+		While runner.isRunning()
+			runner.update()
+		Wend
+
+		Return runner.getLine()
 	End Method
 
 
