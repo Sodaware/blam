@@ -159,8 +159,6 @@ Type CopyTask Extends BuildTask
 	' ------------------------------------------------------------
 
 	Method printHeader()
-
-		' TODO: Don't do this with a single file.
 		If Self.files = Null Then Return
 
 		Local fromDirName:String = Self.files.dir
@@ -169,8 +167,7 @@ Type CopyTask Extends BuildTask
 		fromDirName = fromDirName.Replace(ExtractDir(Self.getProject().getFilePath()), "")
 		toDirName	= toDirName.Replace(ExtractDir(Self.getProject().getFilePath()), "")
 
-		Self.Log("Copying from '" + fromDirName + "' to '" + toDirName + "'")
-
+		Self.log("Copying from '" + fromDirName + "' to '" + toDirName + "'")
 	End Method
 
 End Type
