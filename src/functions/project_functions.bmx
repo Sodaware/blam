@@ -20,13 +20,17 @@ Type ProjectFunctions Extends FunctionSet
 	' -- Project Information
 	' ------------------------------------------------------------
 
-	''' <summary>Gets the name of the current project.</summary>
+	''' <summary>
+	''' Get the name of the current project.
+	'''
+	''' This is set by the "name" attribute of the main "project" element.
+	''' </summary>
 	''' <returns>The current project name.</returns>
 	Method getName:String()													{ name="project::get-name"}
 		Return Self.getProject().getName()
 	End Method
 
-	''' <summary>Get the path of the current build file.</summary>
+	''' <summary>Get the directory of the current build file.</summary>
 	''' <returns>Full path of current build file, minus the file name.</returns>
 	Method getBuildfilePath:String()										{ name="project::get-buildfile-path" }
 		Return ExtractDir(Self.getProject().getFilePath())
@@ -43,7 +47,7 @@ Type ProjectFunctions Extends FunctionSet
 	' -- Property Information
 	' ------------------------------------------------------------
 
-	''' <summary>Verifies that a project or current target has a property.</summary>
+	''' <summary>Verifies that the project or current target has a property.</summary>
 	''' <param name="propertyName">The property to find.</param>
 	''' <returns>True if property found, false if not.</returns>
 	Method propertyExists:Int(propertyName:String)							{ name="project::property-exists"}

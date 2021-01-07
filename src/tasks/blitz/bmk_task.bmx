@@ -97,7 +97,7 @@ Type BmkTask Extends BuildTask
 		' Add source (either a file or a mod name)
 		command:+ " " + ProcessRunner.GetSafeName(Self.source)
 
-		Local fileCount:Int		= 0
+		Local fileCount:Int = 0
 
 		' -- Execute
 		Local compileProcess:ProcessRunner = ProcessRunner.Create(command)
