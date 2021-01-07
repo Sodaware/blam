@@ -48,11 +48,11 @@ Type BuildCommand
 	End Method
 
 	Method hasAttribute:Byte(name:String)
-		Return ( Self._parameters.valueForKey(name) <> Null )
+		Return (Self._parameters.valueForKey(name.toLower()) <> Null)
 	End Method
 
 	Method getAttribute:String(name:String)
-		Return String(Self._parameters.ValueForKey(name))
+		Return String(Self._parameters.ValueForKey(name.toLower()))
 	End Method
 
 
